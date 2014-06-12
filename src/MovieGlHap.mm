@@ -8,11 +8,14 @@
 
 #include "cinder/Cinder.h"
 #include "cinder/app/App.h"
+#include "cinder/Color.h"
 #include "MovieGlHap.h"
 #import "HapPixelBufferTexture.h"
 extern "C" {
 #include "HapSupport.h"
 }
+
+#include "Resources.h"
 
 #define IS_HAP(hapTexture)		(CVPixelBufferGetPixelFormatType(hapTexture.buffer)==kHapPixelFormatTypeRGB_DXT1)
 #define IS_HAP_A(hapTexture)	(CVPixelBufferGetPixelFormatType(hapTexture.buffer)==kHapPixelFormatTypeRGBA_DXT5)
@@ -45,7 +48,9 @@ namespace cinder { namespace qtime {
 
 	
 	MovieGlHap::Obj::Obj()
-	: MovieBase::Obj(), hapTexture(NULL)
+	: MovieBase::Obj()
+	, hapTexture(nullptr)
+	, mHapGlsl( gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) ) )
 	{
 	}
 	
@@ -64,28 +69,28 @@ namespace cinder { namespace qtime {
 	
 	
 	MovieGlHap::MovieGlHap( const MovieLoader &loader )
-	: MovieBase(), mObj( new Obj() ), mFboFrameCount( 0 ), bRectTexture( false )
+	: MovieBase(), mObj( new Obj() )
 	{
 		MovieBase::initFromLoader( loader );
 		allocateVisualContext();
 	}
 	
 	MovieGlHap::MovieGlHap( const fs::path &path )
-	: MovieBase(), mObj( new Obj() ), mFboFrameCount( 0 ), bRectTexture( false )
+	: MovieBase(), mObj( new Obj() )
 	{
 		MovieBase::initFromPath( path );
 		allocateVisualContext();
 	}
 	
 	MovieGlHap::MovieGlHap( const void *data, size_t dataSize, const std::string &fileNameHint, const std::string &mimeTypeHint )
-	: MovieBase(), mObj( new Obj() ), mFboFrameCount( 0 ), bRectTexture( false )
+	: MovieBase(), mObj( new Obj() )
 	{
 		MovieBase::initFromMemory( data, dataSize, fileNameHint, mimeTypeHint );
 		allocateVisualContext();
 	}
 	
 	MovieGlHap::MovieGlHap( DataSourceRef dataSource, const std::string mimeTypeHint )
-	: MovieBase(), mObj( new Obj() ), mFboFrameCount( 0 ), bRectTexture( false )
+	: MovieBase(), mObj( new Obj() )
 	{
 		MovieBase::initFromDataSource( dataSource, mimeTypeHint );
 		allocateVisualContext();
@@ -123,9 +128,10 @@ namespace cinder { namespace qtime {
 		}
 		// Load non-HAP Movie
 		else
-		{
-			CGLContextObj cglContext = app::App::get()->getRenderer()->getCglContext();
+		{			
+			CGLContextObj cglContext = ::CGLGetCurrentContext();
 			CGLPixelFormatObj cglPixelFormat = ::CGLGetPixelFormat( cglContext );
+			
 			// Creates a new OpenGL texture context for a specified OpenGL context and pixel format
 			::QTOpenGLTextureContextCreate( kCFAllocatorDefault, cglContext, cglPixelFormat, NULL, (QTVisualContextRef*)&getObj()->mVisualContext );
 			::SetMovieVisualContext( getObj()->mMovie, (QTVisualContextRef)getObj()->mVisualContext );
@@ -156,7 +162,12 @@ namespace cinder { namespace qtime {
 						mCodecName = "HapQ";
                         break;
                     default:
-						char name[5] = { (codecType>>24)&0xFF, (codecType>>16)&0xFF, (codecType>>8)&0xFF, (codecType>>0)&0xFF, '\0' };
+						char name[5] = {
+							static_cast<char>((codecType>>24)&0xFF),
+							static_cast<char>((codecType>>16)&0xFF),
+							static_cast<char>((codecType>>8)&0xFF),
+							static_cast<char>((codecType>>0)&0xFF),
+							'\0' };
 						mCodecName = std::string(name);
 						//NSLog(@"codec [%s]",mCodecName.c_str());
                         break;
@@ -166,13 +177,17 @@ namespace cinder { namespace qtime {
 
 
 		// Set framerate callback
-		this->setNewFrameCallback( updateMovieFPS, (void*)this );
+//		this->setNewFrameCallback( updateMovieFPS, (void*)this );
 	}
 	
-	static void CVOpenGLTextureDealloc( void *refcon )
+#if defined( CINDER_MAC )
+	static void CVOpenGLTextureDealloc( gl::Texture *texture, void *refcon )
 	{
 		CVOpenGLTextureRelease( (CVImageBufferRef)(refcon) );
+		delete texture;
 	}
+	
+#endif // defined( CINDER_MAC )
 	
 	void MovieGlHap::Obj::releaseFrame()
 	{
@@ -195,13 +210,13 @@ namespace cinder { namespace qtime {
 			
 			// Update HAP texture
 			hapTexture.buffer = cvImage;
-			
 			// Make gl::Texture
 			GLenum target = GL_TEXTURE_2D;
 			GLuint name = hapTexture.textureName;
-			mTexture = gl::Texture( target, name, hapTexture.textureWidth, hapTexture.textureHeight, true );
-			mTexture.setCleanTexCoords( mWidth/(float)hapTexture.textureWidth, mHeight/(float)hapTexture.textureHeight );
-			mTexture.setFlipped( false );
+			mTexture = gl::Texture::create( target, name, hapTexture.textureWidth, hapTexture.textureHeight, true );
+//			app::console() << mWidth <<  " " << hapTexture.textureWidth <<  " " << mHeight <<  " " << hapTexture.textureHeight << std::endl;
+			mTexture->setCleanTexCoords( mWidth/(float)hapTexture.textureWidth, mHeight/(float)hapTexture.textureHeight );
+			mTexture->setFlipped( false );
 			
 			// Release CVimage (hapTexture has copied it)
 			CVBufferRelease(cvImage);
@@ -213,67 +228,37 @@ namespace cinder { namespace qtime {
 			GLenum target = CVOpenGLTextureGetTarget( imgRef );
 			GLuint name = CVOpenGLTextureGetName( imgRef );
 			bool flipped = ! CVOpenGLTextureIsFlipped( imgRef );
-			mTexture = gl::Texture( target, name, mWidth, mHeight, true );
+			mTexture = gl::TextureRef( new gl::Texture( target, name, mWidth, mHeight, true ), std::bind( CVOpenGLTextureDealloc, std::placeholders::_1, imgRef ) );
 			Vec2f t0, lowerRight, t2, upperLeft;
 			::CVOpenGLTextureGetCleanTexCoords( imgRef, &t0.x, &lowerRight.x, &t2.x, &upperLeft.x );
-			mTexture.setCleanTexCoords( std::max( upperLeft.x, lowerRight.x ), std::max( upperLeft.y, lowerRight.y ) );
-			mTexture.setFlipped( flipped );
-			mTexture.setDeallocator( CVOpenGLTextureDealloc, imgRef );
+			mTexture->setCleanTexCoords( std::max( upperLeft.x, lowerRight.x ), std::max( upperLeft.y, lowerRight.y ) );
+			mTexture->setFlipped( flipped );
 		}
 	}
 	
-	const gl::Texture MovieGlHap::getTexture()
+	void MovieGlHap::draw()
 	{
 		updateFrame();
 		
 		mObj->lock();
-		gl::Texture result = mObj->mTexture;
-		// Render FBO when HAPQ or RECT
-		if ( mObj->hapTexture )
-		{
-			// Uses Fbo if HapQ or if we want a RECT texture
-			if ( IS_HAP_Q(mObj->hapTexture) || bRectTexture )
-			{
-				// Create FBO
-				if ( ! mFbo )
-				{
-					bool alpha = ( IS_HAP_A(mObj->hapTexture) /*|| IS_HAP_Q(mObj->hapTexture)*/ );
-					gl::Fbo::Format fmt = gl::Fbo::Format();
-					fmt.setTarget( bRectTexture ? GL_TEXTURE_RECTANGLE_ARB : GL_TEXTURE_2D );
-					fmt.setColorInternalFormat( alpha ? GL_RGBA8 : GL_RGB8 );
-					fmt.enableDepthBuffer( false );
-					//fmt.enableMipmapping();
-					mFbo = gl::Fbo( mObj->mWidth, mObj->mHeight, fmt );
-					mFbo.getTexture().setFlipped();
-				}
-				// New frame to draw?
-				if (mFboFrameCount < _FrameCount && mObj->mTexture )
-				{
-					// push current parameters
-					glPushAttrib( GL_CURRENT_BIT | GL_VIEWPORT_BIT );
-					gl::pushMatrices();
-					// draw FBO
-					GLhandleARB shader = mObj->hapTexture.shaderProgramObject;	// returns a shader if codec is hapQ
-					mFbo.bindFramebuffer();
-					gl::setMatricesWindow( mFbo.getSize() );
-					gl::setViewport( mFbo.getBounds() );
-					gl::color( Color::white() );
-					if (shader != NULL) glUseProgramObjectARB(shader);
-					gl::draw( mObj->mTexture, Area( mObj->mTexture.getCleanBounds() ), mFbo.getBounds() );
-					if (shader != NULL) glUseProgramObjectARB(NULL);
-					mFbo.unbindFramebuffer();
-					// pop current parameters
-					gl::popMatrices();
-					glPopAttrib();
-					mFboFrameCount = _FrameCount;
-				}
-				result = mFbo.getTexture();
+		if( mObj->mTexture ) {
+			Rectf centeredRect = Rectf( app::toPixels( mObj->mTexture->getCleanBounds() ) ).getCenteredFit( app::toPixels( app::getWindowBounds() ), true );
+			gl::color( Color::gray(0.2));
+			gl::drawStrokedRect( centeredRect );
+			gl::color( Color::white() );
+			
+			if( IS_HAP_Q(mObj->hapTexture) ) {
+				gl::ScopedGlslProg shader( mObj->mHapGlsl );
+				gl::ScopedTextureBind tex( mObj->mTexture );
+				float cw = mObj->mTexture->getCleanWidth();
+				float ch = mObj->mTexture->getCleanHeight();
+				float w = mObj->mTexture->getWidth();
+				float h = mObj->mTexture->getHeight();
+				gl::drawSolidRect( centeredRect, Rectf(0, 0, cw/w, ch/h) );
+			} else {
+				gl::draw( mObj->mTexture, centeredRect );
 			}
 		}
 		mObj->unlock();
-		
-		return result;
 	}
-	
-
 } } //namespace cinder::qtime

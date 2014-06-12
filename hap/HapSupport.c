@@ -13,10 +13,6 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
  
- * Neither the name of Hap nor the name of its contributors
- may be used to endorse or promote products derived from this software
- without specific prior written permission.
- 
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,7 +26,13 @@
  */
 
 #include "HapSupport.h"
-#import <QuickTime/QuickTime.h>
+
+#if defined(__APPLE__)
+#define HAP_BZERO(x,y) bzero((x),(y))
+#else
+#include <Windows.h>
+#define HAP_BZERO(x,y) ZeroMemory((x),(y))
+#endif
 
 /*
  These are the four-character-codes used to designate the three Hap codecs
@@ -45,12 +47,14 @@
 static Boolean HapQTCodecIsAvailable(OSType codecType)
 {
     CodecNameSpecListPtr list;
+    OSStatus error;
+    short i;
     
-    OSStatus error = GetCodecNameList(&list, 0);
+    error = GetCodecNameList(&list, 0);
     if (error) return false;
     
-    for (short i = 0; i < list->count; i++ )
-    {        
+    for (i = 0; i < list->count; i++ )
+    {
         if (list->list[i].cType == codecType) return true;
     }
     
@@ -67,7 +71,8 @@ Boolean HapQTQuickTimeMovieHasHapTrackPlayable(Movie movie)
 {
     if (movie)
     {
-        for (long i = 1; i <= GetMovieTrackCount(movie); i++) {
+        long i;
+        for (i = 1; i <= GetMovieTrackCount(movie); i++) {
             Track track = GetMovieIndTrack(movie, i);
             Media media = GetTrackMedia(track);
             OSType mediaType;
@@ -75,9 +80,10 @@ Boolean HapQTQuickTimeMovieHasHapTrackPlayable(Movie movie)
             if (mediaType == VideoMediaType)
             {
                 // Get the codec-type of this track
+                OSType codecType;
                 ImageDescriptionHandle imageDescription = (ImageDescriptionHandle)NewHandle(0); // GetMediaSampleDescription will resize it
                 GetMediaSampleDescription(media, 1, (SampleDescriptionHandle)imageDescription);
-                OSType codecType = (*imageDescription)->cType;
+                codecType = (*imageDescription)->cType;
                 DisposeHandle((Handle)imageDescription);
                 
                 switch (codecType) {
@@ -100,11 +106,11 @@ Boolean HapQTQuickTimeMovieHasHapTrackPlayable(Movie movie)
  */
 static void HapQTAddNumberToDictionary( CFMutableDictionaryRef dictionary, CFStringRef key, SInt32 numberSInt32 )
 {
-	CFNumberRef number = CFNumberCreate( NULL, kCFNumberSInt32Type, &numberSInt32 );
-	if( ! number )
-		return;
-	CFDictionaryAddValue( dictionary, key, number );
-	CFRelease( number );
+    CFNumberRef number = CFNumberCreate( NULL, kCFNumberSInt32Type, &numberSInt32 );
+    if( ! number )
+        return;
+    CFDictionaryAddValue( dictionary, key, number );
+    CFRelease( number );
 }
 
 /*
@@ -122,7 +128,8 @@ static void HapQTRegisterDXTPixelFormat(OSType fmt, short bits_per_pixel, SInt32
                                                             0,
                                                             &kCFTypeDictionaryKeyCallBacks,
                                                             &kCFTypeDictionaryValueCallBacks);
-    bzero(&pixelInfo, sizeof(pixelInfo));
+    
+    HAP_BZERO(&pixelInfo, sizeof(pixelInfo));
     pixelInfo.size  = sizeof(ICMPixelFormatInfo);
     pixelInfo.formatFlags = (has_alpha ? kICMPixelFormatHasAlphaChannel : 0);
     pixelInfo.bitsPerPixel[0] = bits_per_pixel;
@@ -141,7 +148,7 @@ static void HapQTRegisterDXTPixelFormat(OSType fmt, short bits_per_pixel, SInt32
     HapQTAddNumberToDictionary(dict, kCVPixelFormatBlockVerticalAlignment, 4);
     
     HapQTAddNumberToDictionary(dict, kCVPixelFormatOpenGLInternalFormat, open_gl_internal_format);
-        
+	
     // kCVPixelFormatContainsAlpha is only defined in the SDK for 10.7 plus
     CFDictionarySetValue(dict, CFSTR("ContainsAlpha"), (has_alpha ? kCFBooleanTrue : kCFBooleanFalse));
     
@@ -165,33 +172,39 @@ static void HapQTRegisterPixelFormats(void)
 
 CFDictionaryRef HapQTCreateCVPixelBufferOptionsDictionary()
 {
-    // The pixel formats must be registered before requesting them for a QTPixelBufferContext.
-    // The codec does this but it is possible it may not be loaded yet.
-    HapQTRegisterPixelFormats();
-    
-    // The pixel formats we want. These are registered by the Hap codec.
+    // The pixel formats we want.
     SInt32 rgb_dxt1 = kHapPixelFormatTypeRGB_DXT1;
     SInt32 rgba_dxt5 = kHapPixelFormatTypeRGBA_DXT5;
     SInt32 ycocg_dxt5 = kHapPixelFormatTypeYCoCg_DXT5;
     
-    const void *formatNumbers[3] = {
-        CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &rgb_dxt1),
-        CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &rgba_dxt5),
-        CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &ycocg_dxt5)
-    };
+    const void *formatNumbers[3];
     
-    CFArrayRef formats = CFArrayCreate(kCFAllocatorDefault, formatNumbers, 3, &kCFTypeArrayCallBacks);
+    CFDictionaryRef dictionary = NULL;
     
-    CFRelease(formatNumbers[0]);
-    CFRelease(formatNumbers[1]);
-    CFRelease(formatNumbers[2]);
+    // The pixel formats must be registered before requesting them for a QTPixelBufferContext.
+    // The codec does this but it is possible it may not be loaded yet.
+    HapQTRegisterPixelFormats();
     
-    const void *keys[1] = { kCVPixelBufferPixelFormatTypeKey };
-    const void *values[1] = { formats };
+    formatNumbers[0] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &rgb_dxt1);
+    formatNumbers[1] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &rgba_dxt5);
+    formatNumbers[2] = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &ycocg_dxt5);
     
-    CFDictionaryRef dictionary = CFDictionaryCreate(kCFAllocatorDefault, keys, values, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    
-    CFRelease(formats);
+    if (formatNumbers[0] && formatNumbers[1] && formatNumbers[2])
+    {
+        CFArrayRef formats = CFArrayCreate(kCFAllocatorDefault, formatNumbers, 3, &kCFTypeArrayCallBacks);
+        if (formats)
+        {
+            const void *keys[1] = { kCVPixelBufferPixelFormatTypeKey };
+            const void *values[1] = { formats };
+            
+            dictionary = CFDictionaryCreate(kCFAllocatorDefault, keys, values, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+            
+            CFRelease(formats);
+        }
+    }
+    if (formatNumbers[0]) CFRelease(formatNumbers[0]);
+    if (formatNumbers[1]) CFRelease(formatNumbers[1]);
+    if (formatNumbers[2]) CFRelease(formatNumbers[2]);
     
     return dictionary;
 }

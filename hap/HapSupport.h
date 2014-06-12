@@ -13,10 +13,6 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
  
- * Neither the name of Hap nor the name of its contributors
- may be used to endorse or promote products derived from this software
- without specific prior written permission.
- 
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,8 +28,13 @@
 #ifndef QTMultiGPUTextureIssue_HapSupport_h
 #define QTMultiGPUTextureIssue_HapSupport_h
 
-#import <CoreFoundation/CoreFoundation.h>
-#import <QuickTime/QuickTime.h>
+#if defined(__APPLE__)
+#include <CoreFoundation/CoreFoundation.h>
+#include <QuickTime/QuickTime.h>
+#elif defined(_WIN32)
+#include <QTML.h>
+#include <Movies.h>
+#endif
 
 #if __LP64__
 
@@ -41,30 +42,38 @@
 
 #else
 
-/**
- The four-character-codes used to describe the pixel-formats of DXT frames emitted by the Hap QuickTime codec.
- */
+#ifdef __cplusplus
+extern "C" {
+#endif
+	
+	/**
+	 The four-character-codes used to describe the pixel-formats of DXT frames emitted by the Hap QuickTime codec.
+	 */
 #define kHapPixelFormatTypeRGB_DXT1 'DXt1'
 #define kHapPixelFormatTypeRGBA_DXT5 'DXT5'
 #define kHapPixelFormatTypeYCoCg_DXT5 'DYt5'
-
-/**
- Returns true if any track of movie is a Hap track and the codec is installed to handle it, otherwise false.
- */
-Boolean HapQTQuickTimeMovieHasHapTrackPlayable(Movie movie);
-
+	
+	/**
+	 Returns true if any track of movie is a Hap track and the codec is installed to handle it, otherwise false.
+	 */
+	Boolean HapQTQuickTimeMovieHasHapTrackPlayable(Movie movie);
+	
 #ifdef __OBJC__
-/**
- Returns YES if any track of movie is a Hap track and the codec is installed to handle it, otherwise NO.
- */
+	/**
+	 Returns YES if any track of movie is a Hap track and the codec is installed to handle it, otherwise NO.
+	 */
 #define HapQTMovieHasHapTrackPlayable(m) ((BOOL)HapQTQuickTimeMovieHasHapTrackPlayable([(m) quickTimeMovie]))
 #endif
-
-/**
- Returns a dictionary suitable to pass with the kQTVisualContextPixelBufferAttributesKey in an options dictionary when
- creating a CVPixelBufferContext.
- */
-CFDictionaryRef HapQTCreateCVPixelBufferOptionsDictionary();
+	
+	/**
+	 Returns a dictionary suitable to pass with the kQTVisualContextPixelBufferAttributesKey in an options dictionary when
+	 creating a CVPixelBufferContext.
+	 */
+	CFDictionaryRef HapQTCreateCVPixelBufferOptionsDictionary();
+	
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

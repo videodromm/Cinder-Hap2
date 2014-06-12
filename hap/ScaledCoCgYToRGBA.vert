@@ -1,3 +1,5 @@
+#version 400
+
 /*
  ScaledCoCgYToRGBA.vert
  Hap QuickTime Playback
@@ -29,8 +31,15 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+in vec4 ciPosition;
+in vec2 ciTexCoord0;
+
+uniform mat4 ciModelViewProjection;
+
+out vec2	vTexCoord0;
+
 void main(void)
 {
-    gl_Position = ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_Position = ciModelViewProjection * ciPosition;
+    vTexCoord0 = ciTexCoord0;
 }

@@ -52,7 +52,6 @@
     GLuint           height;
     BOOL              valid;
     GLenum   internalFormat;
-    GLhandleARB      shader;
 }
 /**
  Returns a HapPixelBufferTexture to draw in the provided CGL context.
@@ -89,13 +88,6 @@
  The height of the image in texels. The image may not fill the entire texture.
  */
 @property (readonly) GLuint height;
-
-/**
- Scaled YCoCg DXT5 requires a shader to convert color values when it is drawn.
- If the attached pixel-buffer contains Scaled YCoCg DXT5 pixels, the value of this property will be non-NULL
- and should be bound to the GL context prior to drawing the texture.
- */
-@property (readonly) GLhandleARB shaderProgramObject;
 
 // @property (readonly) GLenum textureTarget; // is always GL_TEXTURE_2D
 

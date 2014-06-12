@@ -1,6 +1,8 @@
+#version 400
+
 /*
  ScaledCoCgYToRGBA.frag
- Hap
+ Hap QuickTime Playback
  
  Copyright (c) 2012-2013, Tom Butterworth and Vidvox LLC. All rights reserved.
  Redistribution and use in source and binary forms, with or without
@@ -31,11 +33,15 @@
 
 uniform sampler2D cocgsy_src;
 
+in vec2	vTexCoord0;
+
+out vec4 fragColor;
+
 const vec4 offsets = vec4(-0.50196078431373, -0.50196078431373, 0.0, 0.0);
 
 void main()
 {
-    vec4 CoCgSY = texture2D(cocgsy_src, gl_TexCoord[0].xy);
+    vec4 CoCgSY = texture(cocgsy_src, vTexCoord0);
     
     CoCgSY += offsets;
     
@@ -47,5 +53,5 @@ void main()
     
     vec4 rgba = vec4(Y + Co - Cg, Y + Cg, Y - Co - Cg, 1.0);
     
-    gl_FragColor = rgba;
+    fragColor = rgba;
 }
