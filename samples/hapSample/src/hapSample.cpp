@@ -6,6 +6,8 @@
 #include "cinder/Text.h"
 #include "cinder/Utilities.h"
 #include "cinder/ImageIo.h"
+#include "cinder/gl/Query.h"
+
 #include "MovieGlHap.h"
 
 #include "RectRenderer.h"
@@ -31,6 +33,8 @@ class QuickTimeSampleApp : public AppNative {
 
 	gl::TextureRef			mFrameTexture, mInfoTexture;
 	qtime::MovieGlHapRef	mMovie;
+	
+	gl::QueryTimeElapsedRef mQuery;
 };
 
 void QuickTimeSampleApp::prepareSettings( Settings* settings )
@@ -40,6 +44,8 @@ void QuickTimeSampleApp::prepareSettings( Settings* settings )
 
 void QuickTimeSampleApp::setup()
 {
+	mQuery = gl::QueryTimeElapsed::create();
+	
 	this->setFrameRate(60);
 	this->setFpsSampleInterval(0.25);
 //	fs::path moviePath = getOpenFilePath();
@@ -102,13 +108,13 @@ void QuickTimeSampleApp::update()
 
 void QuickTimeSampleApp::draw()
 {
-	gl::clear( Color::white() );
+	gl::clear( Color::black() );
 	gl::enableAlphaBlending();
 	gl::viewport( toPixels( getWindowSize() ) );
 	
 	// draw grid
 	Vec2f sz = toPixels( getWindowSize() ) / Vec2f(8,6);
-	gl::color( Color::gray(0.8));
+	gl::color( Color::gray(0.2));
 	for (int x = 0 ; x < 8 ; x++ )
 		for (int y = (x%2?0:1) ; y < 6 ; y+=2 )
 			 gl::drawSolidRect( Rectf(0,0,sz.x,sz.y) + sz * Vec2f(x,y) );
@@ -123,8 +129,13 @@ void QuickTimeSampleApp::draw()
 ////		qtime::drawFrame( mFrameTexture, centeredRect );
 //	}
 	
-	if (mMovie)
+	if (mMovie) {
+		mQuery->begin();
 		mMovie->draw();
+		mQuery->end();
+		app::console() << mQuery->getElapsedMilliseconds() << std::endl;
+	}
+
 	
 	// draw info
 	if( mInfoTexture ) {
