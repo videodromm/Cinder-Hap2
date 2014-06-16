@@ -241,7 +241,12 @@ namespace cinder { namespace qtime {
 			
 			gl::ScopedTextureBind bind( mTexture );
 			glTextureRangeAPPLE( mTexture->getTarget(), dataLength, baseAddress );
-			glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, 1 );
+			/* WARNING: Even though it is present here:
+			 * https://github.com/Vidvox/hap-quicktime-playback-demo/blob/master/HapQuickTimePlayback/HapPixelBufferTexture.m#L186
+			 * the following call does not appear necessary. Furthermore, it corrupts display
+			 * when movies are loaded more than once
+			 */
+//			glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, 1 );
 			glCompressedTexSubImage2D(mTexture->getTarget(),
 									  0,
 									  0,
@@ -251,8 +256,6 @@ namespace cinder { namespace qtime {
 									  mTexture->getInternalFormat(),
 									  dataLength,
 									  baseAddress);
-			
-//			glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		}
 		
 		::CVPixelBufferUnlockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
