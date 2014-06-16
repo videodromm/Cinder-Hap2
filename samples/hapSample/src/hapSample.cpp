@@ -6,12 +6,10 @@
 #include "cinder/Text.h"
 #include "cinder/Utilities.h"
 #include "cinder/ImageIo.h"
-//#include "cinder/gl/Query.h"
 
 #include "Resources.h"
 #include "MovieHap.h"
 
-//#include "RectRenderer.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -35,8 +33,6 @@ class QuickTimeSampleApp : public AppNative {
 	gl::TextureRef			mInfoTexture;
 	gl::GlslProgRef			mHapQShader;
 	qtime::MovieGlHapRef	mMovie;
-	bool					mDraw;
-//	gl::QueryTimeElapsedRef mQuery;
 };
 
 void QuickTimeSampleApp::prepareSettings( Settings* settings )
@@ -46,16 +42,10 @@ void QuickTimeSampleApp::prepareSettings( Settings* settings )
 
 void QuickTimeSampleApp::setup()
 {
-	mDraw = false;
 	mHapQShader = gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) );
-	
-//	mQuery = gl::QueryTimeElapsed::create();
 	
 	setFrameRate(60);
 	setFpsSampleInterval(0.25);
-//	fs::path moviePath = getOpenFilePath();
-//	if( ! moviePath.empty() )
-//		loadMovieFile( moviePath );
 }
 
 void QuickTimeSampleApp::keyDown( KeyEvent event )
@@ -70,9 +60,6 @@ void QuickTimeSampleApp::keyDown( KeyEvent event )
 	}
 	else if( event.getChar() == 'r' ) {
 		mMovie.reset();
-	}
-	else if( event.getChar() == 'd' ) {
-		mDraw = !mDraw;
 	}
 }
 
@@ -95,7 +82,6 @@ void QuickTimeSampleApp::loadMovieFile( const fs::path &moviePath )
 		infoText.addLine( toString( mMovie->getDuration() ) + " seconds" );
 		infoText.addLine( toString( mMovie->getNumFrames() ) + " frames" );
 		infoText.addLine( toString( mMovie->getFramerate() ) + " fps" );
-//		infoText.addLine( "Hap? " + std::string( mMovie->isHap() ? "Yes!" : "No." ) );
 		infoText.setBorder( 4, 2 );
 		mInfoTexture = gl::Texture::create( infoText.render( true ) );
 //	}
@@ -129,22 +115,10 @@ void QuickTimeSampleApp::draw()
 	for (int x = 0 ; x < 8 ; x++ )
 		for (int y = (x%2?0:1) ; y < 6 ; y+=2 )
 			 gl::drawSolidRect( Rectf(0,0,sz.x,sz.y) + sz * Vec2f(x,y) );
-
-//	// draw movie
-//	if( mFrameTexture ) {
-//		Rectf centeredRect = Rectf( mFrameTexture->getCleanBounds() ).getCenteredFit( getWindowBounds(), true );
-//		gl::color( Color::gray(0.2));
-//		gl::drawStrokedRect( centeredRect );
-//		gl::color( Color::white() );
-//		gl::draw( mFrameTexture, centeredRect  );
-////		qtime::drawFrame( mFrameTexture, centeredRect );
-//	}
 	
-	if ( mMovie && mDraw ) {
-//		mQuery->begin();
+	
+	if ( mMovie ) {
 		mMovie->draw( mHapQShader );
-//		mQuery->end();
-//		app::console() << mQuery->getElapsedMilliseconds() << std::endl;
 	}
 
 	
@@ -153,14 +127,14 @@ void QuickTimeSampleApp::draw()
 		gl::draw( mInfoTexture, toPixels( Vec2f( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) ) );
 	}
 	
-//	// draw fps
-//	TextLayout infoFps;
-//	infoFps.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
-//	infoFps.setColor( Color::white() );
-//	infoFps.addLine( "Movie Framerate: " + tostr( mMovie->getPlaybackFramerate(), 1 ) );
-//	infoFps.addLine( "App Framerate: " + tostr( this->getAverageFps(), 1 ) );
-//	infoFps.setBorder( 4, 2 );
-//	gl::draw( gl::Texture::create( infoFps.render( true ) ), Vec2f( 20, 20 ) );
+	// draw fps
+	TextLayout infoFps;
+	infoFps.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
+	infoFps.setColor( Color::white() );
+	infoFps.addLine( "Movie Framerate: " + tostr( mMovie->getPlaybackFramerate(), 1 ) );
+	infoFps.addLine( "App Framerate: " + tostr( this->getAverageFps(), 1 ) );
+	infoFps.setBorder( 4, 2 );
+	gl::draw( gl::Texture::create( infoFps.render( true ) ), Vec2f( 20, 20 ) );
 }
 
 CINDER_APP_NATIVE( QuickTimeSampleApp, RendererGl() );
