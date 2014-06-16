@@ -14,7 +14,6 @@
 		00CDB2DB11781E1E00F1AEE2 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00CDB2DA11781E1E00F1AEE2 /* AudioToolbox.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		B055DE5819420C100096F7A5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B055DE5619420C030096F7A5 /* Accelerate.framework */; };
-		DBFABBA116EE865A00295BE5 /* HapPixelBufferTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = DBFABB9E16EE865A00295BE5 /* HapPixelBufferTexture.m */; };
 		DBFABBA216EE865A00295BE5 /* HapSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = DBFABB9F16EE865A00295BE5 /* HapSupport.c */; };
 		DBFABBA416EFDB1F00295BE5 /* MovieGlHap.mm in Sources */ = {isa = PBXBuildFile; fileRef = DBFABB9B16EE853E00295BE5 /* MovieGlHap.mm */; };
 		DBFABBA916F0357400295BE5 /* ScaledCoCgYToRGBA.frag in Resources */ = {isa = PBXBuildFile; fileRef = DBFABBA516F0351100295BE5 /* ScaledCoCgYToRGBA.frag */; };
@@ -40,8 +39,6 @@
 		B055DE5619420C030096F7A5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		DBFABB9A16EE853E00295BE5 /* MovieGlHap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MovieGlHap.h; sourceTree = "<group>"; };
 		DBFABB9B16EE853E00295BE5 /* MovieGlHap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MovieGlHap.mm; sourceTree = "<group>"; };
-		DBFABB9D16EE865A00295BE5 /* HapPixelBufferTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HapPixelBufferTexture.h; path = hap/HapPixelBufferTexture.h; sourceTree = "<group>"; };
-		DBFABB9E16EE865A00295BE5 /* HapPixelBufferTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HapPixelBufferTexture.m; path = hap/HapPixelBufferTexture.m; sourceTree = "<group>"; };
 		DBFABB9F16EE865A00295BE5 /* HapSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = HapSupport.c; path = hap/HapSupport.c; sourceTree = "<group>"; };
 		DBFABBA016EE865A00295BE5 /* HapSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HapSupport.h; path = hap/HapSupport.h; sourceTree = "<group>"; };
 		DBFABBA516F0351100295BE5 /* ScaledCoCgYToRGBA.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = ScaledCoCgYToRGBA.frag; path = hap/ScaledCoCgYToRGBA.frag; sourceTree = "<group>"; };
@@ -163,8 +160,6 @@
 			children = (
 				DBFABBA016EE865A00295BE5 /* HapSupport.h */,
 				DBFABB9F16EE865A00295BE5 /* HapSupport.c */,
-				DBFABB9D16EE865A00295BE5 /* HapPixelBufferTexture.h */,
-				DBFABB9E16EE865A00295BE5 /* HapPixelBufferTexture.m */,
 				DBFABBA516F0351100295BE5 /* ScaledCoCgYToRGBA.frag */,
 				DBFABBA616F0351200295BE5 /* ScaledCoCgYToRGBA.vert */,
 			);
@@ -256,7 +251,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				00C235CC10FE32E300223CDC /* hapSample.cpp in Sources */,
-				DBFABBA116EE865A00295BE5 /* HapPixelBufferTexture.m in Sources */,
 				DBFABBA216EE865A00295BE5 /* HapSupport.c in Sources */,
 				DBFABBA416EFDB1F00295BE5 /* MovieGlHap.mm in Sources */,
 			);

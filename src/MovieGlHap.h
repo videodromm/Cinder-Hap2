@@ -26,6 +26,7 @@ namespace cinder { namespace qtime {
 	public:
 //		enum class Codec {HAP, HAPA, HAPQ};
 //		MovieGlHap() : MovieBase() {}
+		~MovieGlHap() { ci::app::console() << "detroying movie hap" << std::endl; }
 		MovieGlHap( const fs::path &path );
 		MovieGlHap( const class MovieLoader &loader );
 		MovieGlHap( const void *data, size_t dataSize, const std::string &fileNameHint, const std::string &mimeTypeHint = "" );
@@ -33,10 +34,10 @@ namespace cinder { namespace qtime {
 		
 //		const gl::TextureRef	getTexture();
 		
-		void draw();
+		void draw( const gl::GlslProgRef& hapQGlsl );
 		
 		// NEW: Hap support
-		bool			isHap()						{ return bIsHap; };			// Is this movie using any HAP codec?
+//		bool			isHap()						{ return bIsHap; };			// Is this movie using any HAP codec?
 //		void			setAsRect(bool b=true)		{ bRectTexture=b; };		// Should getTexture() return a RECT texture? If not, returns 2D
 		std::string &	getCodecName()				{ return mCodecName; }		// The codec name of the loaded movie
 		float			getPlaybackFramerate();									// The actual playback framerate
@@ -50,11 +51,12 @@ namespace cinder { namespace qtime {
 		{ return MovieGlHapRef( new MovieGlHap( dataSource, mimeTypeHint ) ); }
 	protected:
 		
-		void		allocateVisualContext();
+		void allocateVisualContext();
+//		void deallocateVisualContext();
 
 		// NEW: Hap support
-		bool		bIsHap;				
-//		bool		bRectTexture;		
+//		bool		bIsHap;				
+//		bool		bRectTexture;
 //		gl::FboRef	mFbo;				// Fbo to draw hapQ and RECT textures
 //		uint32_t	mFboFrameCount;		// Frame count when FBO was drawn last time
 		std::string	mCodecName;
@@ -67,11 +69,9 @@ namespace cinder { namespace qtime {
 			virtual void		newFrame( CVImageBufferRef cvImage );
 			
 			gl::TextureRef		mTexture;
+			gl::GlslProgRef		mDefaultShader;
 
-			// NEW: Hap support
-			HapPixelBufferTexture	*hapTexture;	// used only when codec is HAP
-			
-			gl::GlslProgRef		mHapGlsl;
+//			HapPixelBufferTexture	*hapTexture;	// used only when codec is HAP
 		};
 		
 		std::unique_ptr<Obj>		mObj;

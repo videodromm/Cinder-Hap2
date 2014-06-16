@@ -6,7 +6,9 @@
 #include "cinder/Text.h"
 #include "cinder/Utilities.h"
 #include "cinder/ImageIo.h"
-#include "cinder/gl/Query.h"
+//#include "cinder/gl/Query.h"
+
+#include "Resources.h"
 
 #include "MovieGlHap.h"
 
@@ -32,9 +34,10 @@ class QuickTimeSampleApp : public AppNative {
 	void loadMovieFile( const fs::path &path );
 
 	gl::TextureRef			mFrameTexture, mInfoTexture;
+	gl::GlslProgRef			mHapQShader;
 	qtime::MovieGlHapRef	mMovie;
 	
-	gl::QueryTimeElapsedRef mQuery;
+//	gl::QueryTimeElapsedRef mQuery;
 };
 
 void QuickTimeSampleApp::prepareSettings( Settings* settings )
@@ -44,7 +47,9 @@ void QuickTimeSampleApp::prepareSettings( Settings* settings )
 
 void QuickTimeSampleApp::setup()
 {
-	mQuery = gl::QueryTimeElapsed::create();
+	mHapQShader = gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) );
+	
+//	mQuery = gl::QueryTimeElapsed::create();
 	
 	this->setFrameRate(60);
 	this->setFpsSampleInterval(0.25);
@@ -83,7 +88,7 @@ void QuickTimeSampleApp::loadMovieFile( const fs::path &moviePath )
 		infoText.addLine( toString( mMovie->getDuration() ) + " seconds" );
 		infoText.addLine( toString( mMovie->getNumFrames() ) + " frames" );
 		infoText.addLine( toString( mMovie->getFramerate() ) + " fps" );
-		infoText.addLine( "Hap? " + std::string( mMovie->isHap() ? "Yes!" : "No." ) );
+//		infoText.addLine( "Hap? " + std::string( mMovie->isHap() ? "Yes!" : "No." ) );
 		infoText.setBorder( 4, 2 );
 		mInfoTexture = gl::Texture::create( infoText.render( true ) );
 //	}
@@ -130,10 +135,10 @@ void QuickTimeSampleApp::draw()
 //	}
 	
 	if (mMovie) {
-		mQuery->begin();
-		mMovie->draw();
-		mQuery->end();
-		app::console() << mQuery->getElapsedMilliseconds() << std::endl;
+//		mQuery->begin();
+		mMovie->draw( mHapQShader );
+//		mQuery->end();
+//		app::console() << mQuery->getElapsedMilliseconds() << std::endl;
 	}
 
 	

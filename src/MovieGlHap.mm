@@ -9,8 +9,10 @@
 #include "cinder/Cinder.h"
 #include "cinder/app/App.h"
 #include "cinder/Color.h"
+#include "cinder/gl/Context.h"
+
 #include "MovieGlHap.h"
-#import "HapPixelBufferTexture.h"
+//#import "HapPixelBufferTexture.h"
 extern "C" {
 #include "HapSupport.h"
 }
@@ -49,8 +51,7 @@ namespace cinder { namespace qtime {
 	
 	MovieGlHap::Obj::Obj()
 	: MovieBase::Obj()
-	, hapTexture(nullptr)
-	, mHapGlsl( gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) ) )
+	, mDefaultShader( gl::getStockShader( gl::ShaderDef().texture() ) )
 	{
 	}
 	
@@ -58,13 +59,7 @@ namespace cinder { namespace qtime {
 	{
 		// see note on prepareForDestruction()
 		prepareForDestruction();
-		
-		if (hapTexture)
-		{
-			NSLog(@"MovieGlHap :: HAP Destroy");
-            [hapTexture release];
-			hapTexture = NULL;
-		}
+		mTexture.reset();
 	}
 	
 	
@@ -99,7 +94,7 @@ namespace cinder { namespace qtime {
 	void MovieGlHap::allocateVisualContext()
 	{
 		// Load HAP Movie
-		if ( (bIsHap = HapQTQuickTimeMovieHasHapTrackPlayable(getObj()->mMovie)) )
+		if( HapQTQuickTimeMovieHasHapTrackPlayable( getObj()->mMovie ) )
 		{
 			// QT Visual Context attributes
 			OSStatus err = noErr;
@@ -125,16 +120,6 @@ namespace cinder { namespace qtime {
 			}
 			// The movie was attached to the context, we can start it now
 			//this->play();
-		}
-		// Load non-HAP Movie
-		else
-		{			
-			CGLContextObj cglContext = ::CGLGetCurrentContext();
-			CGLPixelFormatObj cglPixelFormat = ::CGLGetPixelFormat( cglContext );
-			
-			// Creates a new OpenGL texture context for a specified OpenGL context and pixel format
-			::QTOpenGLTextureContextCreate( kCFAllocatorDefault, cglContext, cglPixelFormat, NULL, (QTVisualContextRef*)&getObj()->mVisualContext );
-			::SetMovieVisualContext( getObj()->mMovie, (QTVisualContextRef)getObj()->mVisualContext );
 		}
 		
 		// Get codec name
@@ -189,9 +174,24 @@ namespace cinder { namespace qtime {
 	
 #endif // defined( CINDER_MAC )
 	
+	
+//	void MovieGlHap::deallocateVisualContext()
+//	{
+//		if(mVideoTextureRef) {
+//			CFRelease(mVideoTextureRef);
+//			mVideoTextureRef = NULL;
+//		}
+//		
+//		if(mVideoTextureCacheRef) {
+//			CVOpenGLTextureCacheFlush(mVideoTextureCacheRef, 0);
+//			CFRelease(mVideoTextureCacheRef);
+//			mVideoTextureCacheRef = NULL;
+//		}
+//	}
+	
 	void MovieGlHap::Obj::releaseFrame()
 	{
-		mTexture.reset();
+//		mTexture.reset();
 	}
 	
 	void MovieGlHap::Obj::newFrame( CVImageBufferRef cvImage )
@@ -200,43 +200,118 @@ namespace cinder { namespace qtime {
 		CFTypeID imageType = CFGetTypeID(cvImage);
 		if (imageType == CVPixelBufferGetTypeID())
 		{
-			// We re-use a texture for uploading the DXT pixel-buffer, create it if it doesn't already exist
-			if (hapTexture == nil)
-			{
-				CGLContextObj cglContext = app::App::get()->getRenderer()->getCglContext();
-				hapTexture = [[HapPixelBufferTexture alloc] initWithContext:cglContext];
-				NSLog(@"MovieGlHap :: HAP Init");
+			CVBufferRetain(cvImage);
+			
+			CVPixelBufferUnlockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
+			CVBufferRelease(cvImage);
+			
+			auto buffer = cvImage;
+			
+			CVPixelBufferLockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
+			
+			GLuint width = CVPixelBufferGetWidth( cvImage );
+			GLuint height = CVPixelBufferGetHeight( cvImage );
+			
+			assert(buffer != NULL);
+			
+			// Check the buffer padding
+			
+			size_t extraRight, extraBottom;
+			
+			CVPixelBufferGetExtendedPixels(buffer, NULL, &extraRight, NULL, &extraBottom);
+			GLuint roundedWidth = width + extraRight;
+			GLuint roundedHeight = height + extraBottom;
+			
+			// Valid DXT will be a multiple of 4 wide and high
+			
+			assert( !(roundedWidth % 4 != 0 || roundedHeight % 4 != 0) );
+			
+			OSType newPixelFormat = CVPixelBufferGetPixelFormatType(buffer);
+			
+			GLenum internalFormat;
+			unsigned int bitsPerPixel;
+			
+			switch (newPixelFormat) {
+				case kHapPixelFormatTypeRGB_DXT1:
+					internalFormat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+					bitsPerPixel = 4;
+					break;
+				case kHapPixelFormatTypeRGBA_DXT5:
+				case kHapPixelFormatTypeYCoCg_DXT5:
+					internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+					bitsPerPixel = 8;
+					break;
+				default:
+					// we don't support non-DXT pixel buffers
+					assert( false );
+					return;
+					break;
 			}
 			
-			// Update HAP texture
-			hapTexture.buffer = cvImage;
-			// Make gl::Texture
-			GLenum target = GL_TEXTURE_2D;
-			GLuint name = hapTexture.textureName;
-			mTexture = gl::Texture::create( target, name, hapTexture.textureWidth, hapTexture.textureHeight, true );
-//			app::console() << mWidth <<  " " << hapTexture.textureWidth <<  " " << mHeight <<  " " << hapTexture.textureHeight << std::endl;
-			mTexture->setCleanTexCoords( mWidth/(float)hapTexture.textureWidth, mHeight/(float)hapTexture.textureHeight );
-			mTexture->setFlipped( false );
+			// Ignore the value for CVPixelBufferGetBytesPerRow()
 			
+			size_t bytesPerRow = (roundedWidth * bitsPerPixel) / 8;
+			GLsizei newDataLength = bytesPerRow * roundedHeight; // usually not the full length of the buffer
+			
+			size_t actualBufferSize = CVPixelBufferGetDataSize( buffer );
+			
+			// Check the buffer is as large as we expect it to be
+			
+			if (newDataLength > actualBufferSize)
+			{
+				assert( false );
+				return;
+			}
+			
+            
+			GLvoid *baseAddress = CVPixelBufferGetBaseAddress( buffer );
+						
+			if ( !mTexture ) {
+				// On NVIDIA hardware there is a massive slowdown if DXT textures aren't POT-dimensioned, so we use POT-dimensioned backing
+				GLuint backingWidth = 1;
+				while (backingWidth < roundedWidth) backingWidth <<= 1;
+				
+				GLuint backingHeight = 1;
+				while (backingHeight < roundedHeight) backingHeight <<= 1;
+				
+				// We allocate the texture with no pixel data, then use CompressedTexSubImage to update the content region
+				gl::Texture::Format format;
+				format.wrap(GL_CLAMP_TO_EDGE).magFilter(GL_LINEAR).minFilter(GL_LINEAR).internalFormat(internalFormat).pixelDataType(GL_UNSIGNED_INT_8_8_8_8_REV).pixelDataFormat(GL_BGRA);
+				mTexture = gl::Texture::create(backingWidth, backingHeight, format );
+				mTexture->setCleanTexCoords( width/(float)backingWidth, height/(float)backingHeight );
+				mTexture->setFlipped( false );
+				
+				app::console() << "created texture." << std::endl;
+				
+				{
+					gl::ScopedTextureBind bind( mTexture->getTarget(), mTexture->getId() );
+					glTexParameteri( mTexture->getTarget(), GL_TEXTURE_STORAGE_HINT_APPLE , GL_STORAGE_SHARED_APPLE );
+				}
+			}
+			
+			{
+				gl::ScopedTextureBind bind( mTexture );
+				glTextureRangeAPPLE(mTexture->getTarget(), newDataLength, baseAddress);
+				glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
+				
+				glCompressedTexSubImage2D(mTexture->getTarget(),
+										  0,
+										  0,
+										  0,
+										  roundedWidth,
+										  roundedHeight,
+										  mTexture->getInternalFormat(),
+										  newDataLength,
+										  baseAddress);
+				
+			}
+
 			// Release CVimage (hapTexture has copied it)
 			CVBufferRelease(cvImage);
 		}
-		// Load non-HAP frame
-		else //if (imageType == CVOpenGLTextureGetTypeID())
-		{
-			CVOpenGLTextureRef imgRef = reinterpret_cast<CVOpenGLTextureRef>( cvImage );
-			GLenum target = CVOpenGLTextureGetTarget( imgRef );
-			GLuint name = CVOpenGLTextureGetName( imgRef );
-			bool flipped = ! CVOpenGLTextureIsFlipped( imgRef );
-			mTexture = gl::TextureRef( new gl::Texture( target, name, mWidth, mHeight, true ), std::bind( CVOpenGLTextureDealloc, std::placeholders::_1, imgRef ) );
-			Vec2f t0, lowerRight, t2, upperLeft;
-			::CVOpenGLTextureGetCleanTexCoords( imgRef, &t0.x, &lowerRight.x, &t2.x, &upperLeft.x );
-			mTexture->setCleanTexCoords( std::max( upperLeft.x, lowerRight.x ), std::max( upperLeft.y, lowerRight.y ) );
-			mTexture->setFlipped( flipped );
-		}
 	}
 	
-	void MovieGlHap::draw()
+	void MovieGlHap::draw( const gl::GlslProgRef& hapQGlsl )
 	{
 		updateFrame();
 		
@@ -247,16 +322,21 @@ namespace cinder { namespace qtime {
 			gl::drawStrokedRect( centeredRect );
 			gl::color( Color::white() );
 			
-			if( IS_HAP_Q(mObj->hapTexture) ) {
-				gl::ScopedGlslProg shader( mObj->mHapGlsl );
+			auto drawRect = [&]() {
 				gl::ScopedTextureBind tex( mObj->mTexture );
 				float cw = mObj->mTexture->getCleanWidth();
 				float ch = mObj->mTexture->getCleanHeight();
 				float w = mObj->mTexture->getWidth();
 				float h = mObj->mTexture->getHeight();
 				gl::drawSolidRect( centeredRect, Rectf(0, 0, cw/w, ch/h) );
+			};
+			
+			if( hapQGlsl && mCodecName == "HapQ" ) {
+				gl::ScopedGlslProg bind( hapQGlsl );
+				drawRect();
 			} else {
-				gl::draw( mObj->mTexture, centeredRect );
+				gl::ScopedGlslProg bind( mObj->mDefaultShader );
+				drawRect();
 			}
 		}
 		mObj->unlock();

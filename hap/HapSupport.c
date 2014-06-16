@@ -65,8 +65,6 @@ static Boolean HapQTCodecIsAvailable(OSType codecType)
  Much of QuickTime is deprecated in recent MacOS but no equivalent functionality exists in modern APIs,
  so we ignore these warnings.
  */
-#pragma GCC push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 Boolean HapQTQuickTimeMovieHasHapTrackPlayable(Movie movie)
 {
     if (movie)
@@ -99,7 +97,6 @@ Boolean HapQTQuickTimeMovieHasHapTrackPlayable(Movie movie)
     }
     return false;
 }
-#pragma GCC pop
 
 /*
  Utility function, does what it says...
