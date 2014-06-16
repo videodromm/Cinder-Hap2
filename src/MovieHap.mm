@@ -53,6 +53,7 @@ namespace cinder { namespace qtime {
 	{
 		// see note on prepareForDestruction()
 		prepareForDestruction();
+//		::CVBufferRelease( buffer );
 		mTexture.reset();
 	}
 	
@@ -161,44 +162,38 @@ namespace cinder { namespace qtime {
 		this->setNewFrameCallback( updateMovieFPS, (void*)this );
 	}
 	
+	
+#if defined( CINDER_MAC )
+	static void CVOpenGLTextureDealloc( gl::Texture *texture, void *refcon )
+	{
+		CVOpenGLTextureRelease( (CVImageBufferRef)(refcon) );
+		delete texture;
+	}
+#endif // defined( CINDER_MAC )
+	
 	void MovieGlHap::Obj::releaseFrame()
 	{
 	}
 	
 	void MovieGlHap::Obj::newFrame( CVImageBufferRef cvImage )
 	{
+		CVPixelBufferLockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
 		// Load HAP frame
-		CFTypeID imageType = CFGetTypeID(cvImage);
-		if (imageType == CVPixelBufferGetTypeID())
-		{
-			CVBufferRetain(cvImage);
+		if( CFGetTypeID( cvImage ) == ::CVPixelBufferGetTypeID() ) {
+			GLuint width = ::CVPixelBufferGetWidth( cvImage );
+			GLuint height = ::CVPixelBufferGetHeight( cvImage );
 			
-			CVPixelBufferUnlockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
-			CVBufferRelease(cvImage);
-			
-			auto buffer = cvImage;
-			
-			CVPixelBufferLockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
-			
-			GLuint width = CVPixelBufferGetWidth( cvImage );
-			GLuint height = CVPixelBufferGetHeight( cvImage );
-			
-			CI_ASSERT(buffer != NULL);
+			CI_ASSERT( cvImage != NULL );
 			
 			// Check the buffer padding
-			
 			size_t extraRight, extraBottom;
-			
-			CVPixelBufferGetExtendedPixels(buffer, NULL, &extraRight, NULL, &extraBottom);
+			::CVPixelBufferGetExtendedPixels( cvImage, NULL, &extraRight, NULL, &extraBottom );
 			GLuint roundedWidth = width + extraRight;
 			GLuint roundedHeight = height + extraBottom;
 			
 			// Valid DXT will be a multiple of 4 wide and high
-			
 			CI_ASSERT( !(roundedWidth % 4 != 0 || roundedHeight % 4 != 0) );
-			
-			OSType newPixelFormat = CVPixelBufferGetPixelFormatType(buffer);
-			
+			OSType newPixelFormat = CVPixelBufferGetPixelFormatType( cvImage );
 			GLenum internalFormat;
 			unsigned int bitsPerPixel;
 			switch (newPixelFormat) {
@@ -220,13 +215,12 @@ namespace cinder { namespace qtime {
 			// Ignore the value for CVPixelBufferGetBytesPerRow()
 			size_t bytesPerRow = (roundedWidth * bitsPerPixel) / 8;
 			GLsizei newDataLength = bytesPerRow * roundedHeight; // usually not the full length of the buffer
-			size_t actualBufferSize = CVPixelBufferGetDataSize( buffer );
+			size_t actualBufferSize = ::CVPixelBufferGetDataSize( cvImage );
 			
 			// Check the buffer is as large as we expect it to be
 			CI_ASSERT( newDataLength < actualBufferSize );
-			
             
-			GLvoid *baseAddress = CVPixelBufferGetBaseAddress( buffer );
+			GLvoid *baseAddress = ::CVPixelBufferGetBaseAddress( cvImage );
 						
 			if ( !mTexture ) {
 				// On NVIDIA hardware there is a massive slowdown if DXT textures aren't POT-dimensioned, so we use POT-dimensioned backing
@@ -251,26 +245,24 @@ namespace cinder { namespace qtime {
 				}
 			}
 			
-			{
-				gl::ScopedTextureBind bind( mTexture );
-				glTextureRangeAPPLE(mTexture->getTarget(), newDataLength, baseAddress);
-				glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
-				
-				glCompressedTexSubImage2D(mTexture->getTarget(),
-										  0,
-										  0,
-										  0,
-										  roundedWidth,
-										  roundedHeight,
-										  mTexture->getInternalFormat(),
-										  newDataLength,
-										  baseAddress);
-				
-			}
-
-			// Release CVimage (hapTexture has copied it)
-			CVBufferRelease(cvImage);
+			
+			gl::ScopedTextureBind bind( mTexture );
+			glTextureRangeAPPLE( mTexture->getTarget(), newDataLength, baseAddress );
+			glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+			
+			glCompressedTexSubImage2D(mTexture->getTarget(),
+									  0,
+									  0,
+									  0,
+									  roundedWidth,
+									  roundedHeight,
+									  mTexture->getInternalFormat(),
+									  newDataLength,
+									  baseAddress);
 		}
+		
+		CVPixelBufferUnlockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
+		CVPixelBufferRelease(cvImage);
 	}
 	
 	void MovieGlHap::draw( const gl::GlslProgRef& hapQGlsl )
@@ -302,5 +294,7 @@ namespace cinder { namespace qtime {
 			}
 		}
 		mObj->unlock();
+		
+		gl::context()->sanityCheck();
 	}
 } } //namespace cinder::qtime

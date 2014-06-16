@@ -33,7 +33,7 @@ class QuickTimeSampleApp : public AppNative {
 
 	void loadMovieFile( const fs::path &path );
 
-	gl::TextureRef			mFrameTexture, mInfoTexture;
+	gl::TextureRef			mInfoTexture;
 	gl::GlslProgRef			mHapQShader;
 	qtime::MovieGlHapRef	mMovie;
 	
@@ -68,6 +68,9 @@ void QuickTimeSampleApp::keyDown( KeyEvent event )
 		if( ! moviePath.empty() )
 			loadMovieFile( moviePath );
 	}
+	else if( event.getChar() == 'r' ) {
+		mMovie.reset();
+	}
 }
 
 void QuickTimeSampleApp::loadMovieFile( const fs::path &moviePath )
@@ -97,7 +100,6 @@ void QuickTimeSampleApp::loadMovieFile( const fs::path &moviePath )
 //		mInfoTexture.reset();
 //	}
 
-	mFrameTexture.reset();
 }
 
 void QuickTimeSampleApp::fileDrop( FileDropEvent event )
