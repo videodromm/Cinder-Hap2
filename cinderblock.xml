@@ -12,16 +12,11 @@
     >
 
     <sourcePattern>src/*.cpp</sourcePattern>
+    <sourcePattern>src/*.c</sourcePattern>
     <headerPattern>src/*.h</headerPattern>
     <includePath>src</includePath>
     
-    <platform os="macosx">
-		<resource name="RES_HAP_VERT" type="GLSL">resources/ScaledCoCgYToRGBA.vert</resource>
-		<resource name="RES_HAP_FRAG" type="GLSL">resources/ScaledCoCgYToRGBA.frag</resource>
-    </platform>
-    <platform os="msw">
-		<resource name="RES_HAP_VERT" type="GLSL">resources/ScaledCoCgYToRGBA.vert</resource>
-		<resource name="RES_HAP_FRAG" type="GLSL">resources/ScaledCoCgYToRGBA.frag</resource>
-    </platform>
+	<resource name="RES_HAP_VERT" type="GLSL">resources/ScaledCoCgYToRGBA.vert</resource>
+	<resource name="RES_HAP_FRAG" type="GLSL">resources/ScaledCoCgYToRGBA.frag</resource>
 </block>
 </cinder>

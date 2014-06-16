@@ -19,28 +19,28 @@ using namespace std;
 template <typename T> string tostr(const T& t, int p) { ostringstream os; os<<std::setprecision(p)<<std::fixed<<t; return os.str(); }
 
 
-class QuickTimeSampleApp : public AppNative {
- public:
+class HapLoaderApp : public AppNative {
+public:
 	void prepareSettings( Settings* settings ) override;
 	void setup() override;
 	void keyDown( KeyEvent event ) override;
 	void fileDrop( FileDropEvent event ) override;
 	void update() override;
 	void draw() override;
-
+	
 	void loadMovieFile( const fs::path &path );
-
+	
 	gl::TextureRef			mInfoTexture;
 	gl::GlslProgRef			mHapQShader;
 	qtime::MovieGlHapRef	mMovie;
 };
 
-void QuickTimeSampleApp::prepareSettings( Settings* settings )
+void HapLoaderApp::prepareSettings( Settings* settings )
 {
 	settings->enableHighDensityDisplay();
 }
 
-void QuickTimeSampleApp::setup()
+void HapLoaderApp::setup()
 {
 	mHapQShader = gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) );
 	
@@ -48,7 +48,7 @@ void QuickTimeSampleApp::setup()
 	setFpsSampleInterval(0.25);
 }
 
-void QuickTimeSampleApp::keyDown( KeyEvent event )
+void HapLoaderApp::keyDown( KeyEvent event )
 {
 	if( event.getChar() == 'f' ) {
 		setFullScreen( ! isFullScreen() );
@@ -63,47 +63,47 @@ void QuickTimeSampleApp::keyDown( KeyEvent event )
 	}
 }
 
-void QuickTimeSampleApp::loadMovieFile( const fs::path &moviePath )
+void HapLoaderApp::loadMovieFile( const fs::path &moviePath )
 {
-//	try {
-		mMovie.reset();
-		// load up the movie, set it to loop, and begin playing
-		mMovie = qtime::MovieGlHap::create( moviePath );
-		//mMovie.setAsRect();
-		mMovie->setLoop();
-		mMovie->play();
-		
-		// create a texture for showing some info about the movie
-		TextLayout infoText;
-		infoText.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
-		infoText.setColor( Color::white() );
-		infoText.addCenteredLine( moviePath.filename().string() );
-		infoText.addLine( toString( mMovie->getWidth() ) + " x " + toString( mMovie->getHeight() ) + " pixels" );
-		infoText.addLine( toString( mMovie->getDuration() ) + " seconds" );
-		infoText.addLine( toString( mMovie->getNumFrames() ) + " frames" );
-		infoText.addLine( toString( mMovie->getFramerate() ) + " fps" );
-		infoText.setBorder( 4, 2 );
-		mInfoTexture = gl::Texture::create( infoText.render( true ) );
-//	}
-//	catch( ... ) {
-//		console() << "Unable to load the movie." << std::endl;
-//		mInfoTexture.reset();
-//	}
-
+	//	try {
+	mMovie.reset();
+	// load up the movie, set it to loop, and begin playing
+	mMovie = qtime::MovieGlHap::create( moviePath );
+	//mMovie.setAsRect();
+	mMovie->setLoop();
+	mMovie->play();
+	
+	// create a texture for showing some info about the movie
+	TextLayout infoText;
+	infoText.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
+	infoText.setColor( Color::white() );
+	infoText.addCenteredLine( moviePath.filename().string() );
+	infoText.addLine( toString( mMovie->getWidth() ) + " x " + toString( mMovie->getHeight() ) + " pixels" );
+	infoText.addLine( toString( mMovie->getDuration() ) + " seconds" );
+	infoText.addLine( toString( mMovie->getNumFrames() ) + " frames" );
+	infoText.addLine( toString( mMovie->getFramerate() ) + " fps" );
+	infoText.setBorder( 4, 2 );
+	mInfoTexture = gl::Texture::create( infoText.render( true ) );
+	//	}
+	//	catch( ... ) {
+	//		console() << "Unable to load the movie." << std::endl;
+	//		mInfoTexture.reset();
+	//	}
+	
 }
 
-void QuickTimeSampleApp::fileDrop( FileDropEvent event )
+void HapLoaderApp::fileDrop( FileDropEvent event )
 {
 	loadMovieFile( event.getFile( 0 ) );
 }
 
-void QuickTimeSampleApp::update()
+void HapLoaderApp::update()
 {
-//	if (mMovie)
-//		mFrameTexture = mMovie->getTexture();
+	//	if (mMovie)
+	//		mFrameTexture = mMovie->getTexture();
 }
 
-void QuickTimeSampleApp::draw()
+void HapLoaderApp::draw()
 {
 	gl::clear( Color::black() );
 	gl::enableAlphaBlending();
@@ -114,13 +114,12 @@ void QuickTimeSampleApp::draw()
 	gl::color( Color::gray(0.2));
 	for (int x = 0 ; x < 8 ; x++ )
 		for (int y = (x%2?0:1) ; y < 6 ; y+=2 )
-			 gl::drawSolidRect( Rectf(0,0,sz.x,sz.y) + sz * Vec2f(x,y) );
+			gl::drawSolidRect( Rectf(0,0,sz.x,sz.y) + sz * Vec2f(x,y) );
 	
 	
 	if ( mMovie ) {
 		mMovie->draw( mHapQShader );
 	}
-
 	
 	// draw info
 	if( mInfoTexture ) {
@@ -137,4 +136,4 @@ void QuickTimeSampleApp::draw()
 	gl::draw( gl::Texture::create( infoFps.render( true ) ), Vec2f( 20, 20 ) );
 }
 
-CINDER_APP_NATIVE( QuickTimeSampleApp, RendererGl() );
+CINDER_APP_NATIVE( HapLoaderApp, RendererGl() );

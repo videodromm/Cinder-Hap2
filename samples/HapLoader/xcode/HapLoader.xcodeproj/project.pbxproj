@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,13 +12,16 @@
 		00B784B40FF439BC000DE1D7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B00FF439BC000DE1D7 /* AudioToolbox.framework */; };
 		00B784B50FF439BC000DE1D7 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B10FF439BC000DE1D7 /* AudioUnit.framework */; };
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
+		14265A699EF0476BB3F0370A /* HapLoaderApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A70F5B54C70440AF81D01FA0 /* HapLoaderApp.cpp */; };
+		19F06D448FF04150B4E524B5 /* MovieHap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C91041FA097C45A3B80AA36A /* MovieHap.cpp */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
+		77DFA4F1D7C84C2F80DA5C45 /* ScaledCoCgYToRGBA.frag in Resources */ = {isa = PBXBuildFile; fileRef = 7A152D73F2B94C4CAA4118C6 /* ScaledCoCgYToRGBA.frag */; };
+		822789673255430888AE9BD8 /* ScaledCoCgYToRGBA.vert in Resources */ = {isa = PBXBuildFile; fileRef = 726D6EF9B0D64EAE84844ACD /* ScaledCoCgYToRGBA.vert */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		3C8F1290745E476A89E56446 /* MovieHapLoader_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 8A02C921D4654B0A82512F3F /* MovieHapLoader_Prefix.pch */; };
-		4259CC883021470C9DAC84C4 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = ED49EACDB5974995A290E66B /* CinderApp.icns */; };
-		2450662902AF45BC99A0A5B3 /* Resources.h in Headers */ = {isa = PBXBuildFile; fileRef = 8610BBC42E7045FDBF72ED64 /* Resources.h */; };
-		FC27561A01B043FDAB8439A8 /* MovieHapLoaderApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C24CB0E87284329BE2092C6 /* MovieHapLoaderApp.cpp */; };
+		9ED3C098B1DA43D5BC928F7C /* HapSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = 6684ADB19CA34ABDB4D00A72 /* HapSupport.c */; };
+		B0E64ECC194FAAFB008ECF56 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0E64ECB194FAAFB008ECF56 /* QuickTime.framework */; };
+		FC27E3CABD7A4B2BB4DEFFE0 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = B395F615766749498AC59A7D /* CinderApp.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,14 +33,21 @@
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		2F1AE5756B5B45E796356A41 /* HapSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HapSupport.h; path = ../../../src/HapSupport.h; sourceTree = "<group>"; };
+		3DCE3288BC0B4481B3D11152 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5323E6B10EAFCA74003A9687 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
 		5323E6B50EAFCA7E003A9687 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
-		8D1107320486CEB800E47090 /* MovieHapLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieHapLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2C24CB0E87284329BE2092C6 /* MovieHapLoaderApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.cpp; path = ../src/MovieHapLoaderApp.cpp; sourceTree = "<group>"; name = MovieHapLoaderApp.cpp; };
-		8610BBC42E7045FDBF72ED64 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ../include/Resources.h; sourceTree = "<group>"; name = Resources.h; };
-		ED49EACDB5974995A290E66B /* CinderApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../resources/CinderApp.icns; sourceTree = "<group>"; name = CinderApp.icns; };
-		35D80A3A73564DE29A12A84D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; name = Info.plist; };
-		8A02C921D4654B0A82512F3F /* MovieHapLoader_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; path = MovieHapLoader_Prefix.pch; sourceTree = "<group>"; name = MovieHapLoader_Prefix.pch; };
+		660079ACE9C54F598F746510 /* MovieHap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MovieHap.h; path = ../../../src/MovieHap.h; sourceTree = "<group>"; };
+		6684ADB19CA34ABDB4D00A72 /* HapSupport.c */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; name = HapSupport.c; path = ../../../src/HapSupport.c; sourceTree = "<group>"; };
+		726D6EF9B0D64EAE84844ACD /* ScaledCoCgYToRGBA.vert */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; name = ScaledCoCgYToRGBA.vert; path = ../../../resources/ScaledCoCgYToRGBA.vert; sourceTree = "<group>"; };
+		7A152D73F2B94C4CAA4118C6 /* ScaledCoCgYToRGBA.frag */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; name = ScaledCoCgYToRGBA.frag; path = ../../../resources/ScaledCoCgYToRGBA.frag; sourceTree = "<group>"; };
+		8B4CBD1E633D4EE0842345C6 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../include/Resources.h; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* HapLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HapLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A70F5B54C70440AF81D01FA0 /* HapLoaderApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.cpp; name = HapLoaderApp.cpp; path = ../src/HapLoaderApp.cpp; sourceTree = "<group>"; };
+		ABA62DBAA6D44373B77A5A77 /* HapLoader_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; path = HapLoader_Prefix.pch; sourceTree = "<group>"; };
+		B0E64ECB194FAAFB008ECF56 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
+		B395F615766749498AC59A7D /* CinderApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CinderApp.icns; path = ../resources/CinderApp.icns; sourceTree = "<group>"; };
+		C91041FA097C45A3B80AA36A /* MovieHap.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = MovieHap.cpp; path = ../../../src/MovieHap.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +59,7 @@
 				0091D8F90E81B9330029341E /* OpenGL.framework in Frameworks */,
 				5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */,
 				5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */,
+				B0E64ECC194FAAFB008ECF56 /* QuickTime.framework in Frameworks */,
 				00B784B30FF439BC000DE1D7 /* Accelerate.framework in Frameworks */,
 				00B784B40FF439BC000DE1D7 /* AudioToolbox.framework in Frameworks */,
 				00B784B50FF439BC000DE1D7 /* AudioUnit.framework in Frameworks */,
@@ -59,10 +70,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		01B97315FEAEA392516A2CEA /* Blocks */ = {
+			isa = PBXGroup;
+			children = (
+				A2DBEBEB026E4C6E862BF44E /* Cinder-Hap2 */,
+			);
+			name = Blocks;
+			sourceTree = "<group>";
+		};
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				2C24CB0E87284329BE2092C6 /* MovieHapLoaderApp.cpp */,
+				A70F5B54C70440AF81D01FA0 /* HapLoaderApp.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -75,6 +94,7 @@
 				00B784B10FF439BC000DE1D7 /* AudioUnit.framework */,
 				00B784B20FF439BC000DE1D7 /* CoreAudio.framework */,
 				5323E6B50EAFCA7E003A9687 /* QTKit.framework */,
+				B0E64ECB194FAAFB008ECF56 /* QuickTime.framework */,
 				5323E6B10EAFCA74003A9687 /* CoreVideo.framework */,
 				0091D8F80E81B9330029341E /* OpenGL.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
@@ -94,12 +114,12 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D1107320486CEB800E47090 /* MovieHapLoader.app */,
+				8D1107320486CEB800E47090 /* HapLoader.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		29B97314FDCFA39411CA2CEA /* MovieHapLoader */ = {
+		29B97314FDCFA39411CA2CEA /* HapLoader */ = {
 			isa = PBXGroup;
 			children = (
 				01B97315FEAEA392516A2CEA /* Blocks */,
@@ -109,21 +129,14 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
-			name = MovieHapLoader;
-			sourceTree = "<group>";
-		};
-		01B97315FEAEA392516A2CEA /* Blocks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Blocks;
+			name = HapLoader;
 			sourceTree = "<group>";
 		};
 		29B97315FDCFA39411CA2CEA /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				8610BBC42E7045FDBF72ED64 /* Resources.h */,
-				8A02C921D4654B0A82512F3F /* MovieHapLoader_Prefix.pch */,
+				8B4CBD1E633D4EE0842345C6 /* Resources.h */,
+				ABA62DBAA6D44373B77A5A77 /* HapLoader_Prefix.pch */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -131,8 +144,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				ED49EACDB5974995A290E66B /* CinderApp.icns */,
-				35D80A3A73564DE29A12A84D /* Info.plist */,
+				B395F615766749498AC59A7D /* CinderApp.icns */,
+				3DCE3288BC0B4481B3D11152 /* Info.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -146,12 +159,41 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		640C4FF331F4436DA87D12B9 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				C91041FA097C45A3B80AA36A /* MovieHap.cpp */,
+				6684ADB19CA34ABDB4D00A72 /* HapSupport.c */,
+				2F1AE5756B5B45E796356A41 /* HapSupport.h */,
+				660079ACE9C54F598F746510 /* MovieHap.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		72A24568EE30482A8B1EA3ED /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				726D6EF9B0D64EAE84844ACD /* ScaledCoCgYToRGBA.vert */,
+				7A152D73F2B94C4CAA4118C6 /* ScaledCoCgYToRGBA.frag */,
+			);
+			name = resources;
+			sourceTree = "<group>";
+		};
+		A2DBEBEB026E4C6E862BF44E /* Cinder-Hap2 */ = {
+			isa = PBXGroup;
+			children = (
+				640C4FF331F4436DA87D12B9 /* src */,
+				72A24568EE30482A8B1EA3ED /* resources */,
+			);
+			name = "Cinder-Hap2";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8D1107260486CEB800E47090 /* MovieHapLoader */ = {
+		8D1107260486CEB800E47090 /* HapLoader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MovieHapLoader" */;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "HapLoader" */;
 			buildPhases = (
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
@@ -161,10 +203,10 @@
 			);
 			dependencies = (
 			);
-			name = MovieHapLoader;
+			name = HapLoader;
 			productInstallPath = "$(HOME)/Applications";
-			productName = MovieHapLoader;
-			productReference = 8D1107320486CEB800E47090 /* MovieHapLoader.app */;
+			productName = HapLoader;
+			productReference = 8D1107320486CEB800E47090 /* HapLoader.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -172,7 +214,9 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MovieHapLoader" */;
+			attributes = {
+			};
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "HapLoader" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -182,11 +226,11 @@
 				French,
 				German,
 			);
-			mainGroup = 29B97314FDCFA39411CA2CEA /* MovieHapLoader */;
+			mainGroup = 29B97314FDCFA39411CA2CEA /* HapLoader */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8D1107260486CEB800E47090 /* MovieHapLoader */,
+				8D1107260486CEB800E47090 /* HapLoader */,
 			);
 		};
 /* End PBXProject section */
@@ -196,7 +240,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4259CC883021470C9DAC84C4 /* CinderApp.icns in Resources */,
+				FC27E3CABD7A4B2BB4DEFFE0 /* CinderApp.icns in Resources */,
+				822789673255430888AE9BD8 /* ScaledCoCgYToRGBA.vert in Resources */,
+				77DFA4F1D7C84C2F80DA5C45 /* ScaledCoCgYToRGBA.frag in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,7 +253,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC27561A01B043FDAB8439A8 /* MovieHapLoaderApp.cpp in Sources */,
+				14265A699EF0476BB3F0370A /* HapLoaderApp.cpp in Sources */,
+				19F06D448FF04150B4E524B5 /* MovieHap.cpp in Sources */,
+				9ED3C098B1DA43D5BC928F7C /* HapSupport.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,24 +266,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = HapLoader_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = MovieHapLoader_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
-				PRODUCT_NAME = MovieHapLoader;
-				WRAPPER_EXTENSION = app;
+				PRODUCT_NAME = HapLoader;
 				SYMROOT = ./build;
+				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
 		};
@@ -250,56 +298,56 @@
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = MovieHapLoader_Prefix.pch;
+				GCC_PREFIX_HEADER = HapLoader_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
-				PRODUCT_NAME = MovieHapLoader;
+				PRODUCT_NAME = HapLoader;
 				STRIP_INSTALLED_PRODUCT = YES;
-				WRAPPER_EXTENSION = app;
 				SYMROOT = ./build;
+				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
 		};
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = i386;
-				CINDER_PATH = "../../../../..";
+				CINDER_PATH = ../../../../..;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include ../../../src";
 			};
 			name = Debug;
 		};
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = i386;
-				CINDER_PATH = "../../../../..";
+				CINDER_PATH = ../../../../..;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include ../../../src";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MovieHapLoader" */ = {
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "HapLoader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4B08A954540054247B /* Debug */,
@@ -308,7 +356,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MovieHapLoader" */ = {
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "HapLoader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,

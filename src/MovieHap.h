@@ -1,5 +1,5 @@
 /*
- *  MovieGlHap.h
+ *  MovieHap.h
  *
  *  Created by Roger Sodre on 14/05/10.
  *  Copyright 2010 Studio Avante. All rights reserved.
