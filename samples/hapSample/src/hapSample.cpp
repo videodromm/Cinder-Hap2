@@ -10,7 +10,7 @@
 
 #include "Resources.h"
 
-#include "MovieGlHap.h"
+#include "MovieHap.h"
 
 #include "RectRenderer.h"
 

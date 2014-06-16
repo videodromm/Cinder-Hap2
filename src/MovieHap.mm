@@ -6,22 +6,18 @@
  *
  */
 
-#include "cinder/Cinder.h"
-#include "cinder/app/App.h"
-#include "cinder/Color.h"
-#include "cinder/gl/Context.h"
+#include "MovieHap.h"
 
-#include "MovieGlHap.h"
-//#import "HapPixelBufferTexture.h"
 extern "C" {
 #include "HapSupport.h"
 }
 
 #include "Resources.h"
 
-#define IS_HAP(hapTexture)		(CVPixelBufferGetPixelFormatType(hapTexture.buffer)==kHapPixelFormatTypeRGB_DXT1)
-#define IS_HAP_A(hapTexture)	(CVPixelBufferGetPixelFormatType(hapTexture.buffer)==kHapPixelFormatTypeRGBA_DXT5)
-#define IS_HAP_Q(hapTexture)	(CVPixelBufferGetPixelFormatType(hapTexture.buffer)==kHapPixelFormatTypeYCoCg_DXT5)
+#include "cinder/CinderAssert.h"
+#include "cinder/app/App.h"
+#include "cinder/Color.h"
+#include "cinder/gl/Context.h"
 
 namespace cinder { namespace qtime {
 
@@ -46,8 +42,6 @@ namespace cinder { namespace qtime {
 	{
 		return _AverageFps;
 	}
-	
-
 	
 	MovieGlHap::Obj::Obj()
 	: MovieBase::Obj()
@@ -90,6 +84,11 @@ namespace cinder { namespace qtime {
 		MovieBase::initFromDataSource( dataSource, mimeTypeHint );
 		allocateVisualContext();
 	}
+	
+	MovieGlHap::~MovieGlHap()
+	{
+		app::console() << "detroying movie hap" << std::endl;
+	}
 
 	void MovieGlHap::allocateVisualContext()
 	{
@@ -104,8 +103,7 @@ namespace cinder { namespace qtime {
 																			 forKey:(NSString *)kQTVisualContextPixelBufferAttributesKey];
 			CFRelease(pixelBufferOptions);
 			err = QTPixelBufferContextCreate(kCFAllocatorDefault, (CFDictionaryRef)visualContextOptions, visualContext);
-			if (err != noErr)
-			{
+			if (err != noErr) {
 				NSLog(@"HAP ERROR :: %ld, couldnt create visual context at %s", err, __func__);
 				return;
 			}
@@ -113,8 +111,7 @@ namespace cinder { namespace qtime {
 			//QTVisualContextSetImageAvailableCallback( *visualContext, VisualContextFrameCallback, (void*)this );
 			// Set the movie's visual context
 			err = SetMovieVisualContext( getObj()->mMovie, *visualContext );
-			if (err != noErr)
-			{
+			if (err != noErr) {
 				NSLog(@"HAP ERROR :: %ld SetMovieVisualContext %s", err, __func__);
 				return;
 			}
@@ -160,38 +157,12 @@ namespace cinder { namespace qtime {
             }
         }
 
-
 		// Set framerate callback
-//		this->setNewFrameCallback( updateMovieFPS, (void*)this );
+		this->setNewFrameCallback( updateMovieFPS, (void*)this );
 	}
-	
-#if defined( CINDER_MAC )
-	static void CVOpenGLTextureDealloc( gl::Texture *texture, void *refcon )
-	{
-		CVOpenGLTextureRelease( (CVImageBufferRef)(refcon) );
-		delete texture;
-	}
-	
-#endif // defined( CINDER_MAC )
-	
-	
-//	void MovieGlHap::deallocateVisualContext()
-//	{
-//		if(mVideoTextureRef) {
-//			CFRelease(mVideoTextureRef);
-//			mVideoTextureRef = NULL;
-//		}
-//		
-//		if(mVideoTextureCacheRef) {
-//			CVOpenGLTextureCacheFlush(mVideoTextureCacheRef, 0);
-//			CFRelease(mVideoTextureCacheRef);
-//			mVideoTextureCacheRef = NULL;
-//		}
-//	}
 	
 	void MovieGlHap::Obj::releaseFrame()
 	{
-//		mTexture.reset();
 	}
 	
 	void MovieGlHap::Obj::newFrame( CVImageBufferRef cvImage )
@@ -212,7 +183,7 @@ namespace cinder { namespace qtime {
 			GLuint width = CVPixelBufferGetWidth( cvImage );
 			GLuint height = CVPixelBufferGetHeight( cvImage );
 			
-			assert(buffer != NULL);
+			CI_ASSERT(buffer != NULL);
 			
 			// Check the buffer padding
 			
@@ -224,13 +195,12 @@ namespace cinder { namespace qtime {
 			
 			// Valid DXT will be a multiple of 4 wide and high
 			
-			assert( !(roundedWidth % 4 != 0 || roundedHeight % 4 != 0) );
+			CI_ASSERT( !(roundedWidth % 4 != 0 || roundedHeight % 4 != 0) );
 			
 			OSType newPixelFormat = CVPixelBufferGetPixelFormatType(buffer);
 			
 			GLenum internalFormat;
 			unsigned int bitsPerPixel;
-			
 			switch (newPixelFormat) {
 				case kHapPixelFormatTypeRGB_DXT1:
 					internalFormat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
@@ -242,26 +212,18 @@ namespace cinder { namespace qtime {
 					bitsPerPixel = 8;
 					break;
 				default:
-					// we don't support non-DXT pixel buffers
-					assert( false );
+					CI_ASSERT_MSG( false, "We don't support non-DXT pixel buffers." );
 					return;
 					break;
 			}
 			
 			// Ignore the value for CVPixelBufferGetBytesPerRow()
-			
 			size_t bytesPerRow = (roundedWidth * bitsPerPixel) / 8;
 			GLsizei newDataLength = bytesPerRow * roundedHeight; // usually not the full length of the buffer
-			
 			size_t actualBufferSize = CVPixelBufferGetDataSize( buffer );
 			
 			// Check the buffer is as large as we expect it to be
-			
-			if (newDataLength > actualBufferSize)
-			{
-				assert( false );
-				return;
-			}
+			CI_ASSERT( newDataLength < actualBufferSize );
 			
             
 			GLvoid *baseAddress = CVPixelBufferGetBaseAddress( buffer );
@@ -318,7 +280,7 @@ namespace cinder { namespace qtime {
 		mObj->lock();
 		if( mObj->mTexture ) {
 			Rectf centeredRect = Rectf( app::toPixels( mObj->mTexture->getCleanBounds() ) ).getCenteredFit( app::toPixels( app::getWindowBounds() ), true );
-			gl::color( Color::gray(0.2));
+			gl::color( Color::gray(0.2) );
 			gl::drawStrokedRect( centeredRect );
 			gl::color( Color::white() );
 			

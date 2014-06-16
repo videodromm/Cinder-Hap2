@@ -15,7 +15,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		B055DE5819420C100096F7A5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B055DE5619420C030096F7A5 /* Accelerate.framework */; };
 		DBFABBA216EE865A00295BE5 /* HapSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = DBFABB9F16EE865A00295BE5 /* HapSupport.c */; };
-		DBFABBA416EFDB1F00295BE5 /* MovieGlHap.mm in Sources */ = {isa = PBXBuildFile; fileRef = DBFABB9B16EE853E00295BE5 /* MovieGlHap.mm */; };
+		DBFABBA416EFDB1F00295BE5 /* MovieHap.mm in Sources */ = {isa = PBXBuildFile; fileRef = DBFABB9B16EE853E00295BE5 /* MovieHap.mm */; };
 		DBFABBA916F0357400295BE5 /* ScaledCoCgYToRGBA.frag in Resources */ = {isa = PBXBuildFile; fileRef = DBFABBA516F0351100295BE5 /* ScaledCoCgYToRGBA.frag */; };
 		DBFABBAA16F0357400295BE5 /* ScaledCoCgYToRGBA.vert in Resources */ = {isa = PBXBuildFile; fileRef = DBFABBA616F0351200295BE5 /* ScaledCoCgYToRGBA.vert */; };
 		DBFC174D16EA72870038DE58 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFC174C16EA72870038DE58 /* QTKit.framework */; };
@@ -37,10 +37,10 @@
 		8D1107320486CEB800E47090 /* hapSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hapSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B055DE541942081C0096F7A5 /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Resources.h; sourceTree = "<group>"; };
 		B055DE5619420C030096F7A5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		DBFABB9A16EE853E00295BE5 /* MovieGlHap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MovieGlHap.h; sourceTree = "<group>"; };
-		DBFABB9B16EE853E00295BE5 /* MovieGlHap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MovieGlHap.mm; sourceTree = "<group>"; };
-		DBFABB9F16EE865A00295BE5 /* HapSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = HapSupport.c; path = hap/HapSupport.c; sourceTree = "<group>"; };
-		DBFABBA016EE865A00295BE5 /* HapSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HapSupport.h; path = hap/HapSupport.h; sourceTree = "<group>"; };
+		DBFABB9A16EE853E00295BE5 /* MovieHap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MovieHap.h; sourceTree = "<group>"; };
+		DBFABB9B16EE853E00295BE5 /* MovieHap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MovieHap.mm; sourceTree = "<group>"; };
+		DBFABB9F16EE865A00295BE5 /* HapSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = HapSupport.c; path = ../hap/HapSupport.c; sourceTree = "<group>"; };
+		DBFABBA016EE865A00295BE5 /* HapSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HapSupport.h; path = ../hap/HapSupport.h; sourceTree = "<group>"; };
 		DBFABBA516F0351100295BE5 /* ScaledCoCgYToRGBA.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = ScaledCoCgYToRGBA.frag; path = hap/ScaledCoCgYToRGBA.frag; sourceTree = "<group>"; };
 		DBFABBA616F0351200295BE5 /* ScaledCoCgYToRGBA.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = ScaledCoCgYToRGBA.vert; path = hap/ScaledCoCgYToRGBA.vert; sourceTree = "<group>"; };
 		DBFC174C16EA72870038DE58 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
@@ -155,22 +155,20 @@
 			name = blocks;
 			sourceTree = "<group>";
 		};
-		DBFABBA316EE886700295BE5 /* hap */ = {
+		B0BDB212194F52D1006D18E3 /* resources */ = {
 			isa = PBXGroup;
 			children = (
-				DBFABBA016EE865A00295BE5 /* HapSupport.h */,
-				DBFABB9F16EE865A00295BE5 /* HapSupport.c */,
 				DBFABBA516F0351100295BE5 /* ScaledCoCgYToRGBA.frag */,
 				DBFABBA616F0351200295BE5 /* ScaledCoCgYToRGBA.vert */,
 			);
-			name = hap;
+			name = resources;
 			sourceTree = "<group>";
 		};
 		DBFC175016EA73100038DE58 /* Cinder-Hap */ = {
 			isa = PBXGroup;
 			children = (
+				B0BDB212194F52D1006D18E3 /* resources */,
 				DBFC175B16EA73100038DE58 /* src */,
-				DBFABBA316EE886700295BE5 /* hap */,
 			);
 			name = "Cinder-Hap";
 			path = ../../..;
@@ -179,8 +177,10 @@
 		DBFC175B16EA73100038DE58 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				DBFABB9A16EE853E00295BE5 /* MovieGlHap.h */,
-				DBFABB9B16EE853E00295BE5 /* MovieGlHap.mm */,
+				DBFABBA016EE865A00295BE5 /* HapSupport.h */,
+				DBFABB9F16EE865A00295BE5 /* HapSupport.c */,
+				DBFABB9A16EE853E00295BE5 /* MovieHap.h */,
+				DBFABB9B16EE853E00295BE5 /* MovieHap.mm */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -252,7 +252,7 @@
 			files = (
 				00C235CC10FE32E300223CDC /* hapSample.cpp in Sources */,
 				DBFABBA216EE865A00295BE5 /* HapSupport.c in Sources */,
-				DBFABBA416EFDB1F00295BE5 /* MovieGlHap.mm in Sources */,
+				DBFABBA416EFDB1F00295BE5 /* MovieHap.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
