@@ -53,7 +53,6 @@ namespace cinder { namespace qtime {
 	{
 		// see note on prepareForDestruction()
 		prepareForDestruction();
-//		::CVBufferRelease( buffer );
 		mTexture.reset();
 	}
 	
@@ -102,22 +101,18 @@ namespace cinder { namespace qtime {
 			CFDictionaryRef pixelBufferOptions = HapQTCreateCVPixelBufferOptionsDictionary();
 			NSDictionary *visualContextOptions = [NSDictionary dictionaryWithObject:(NSDictionary *)pixelBufferOptions
 																			 forKey:(NSString *)kQTVisualContextPixelBufferAttributesKey];
-			CFRelease(pixelBufferOptions);
-			err = QTPixelBufferContextCreate(kCFAllocatorDefault, (CFDictionaryRef)visualContextOptions, visualContext);
+			::CFRelease( pixelBufferOptions );
+			err = ::QTPixelBufferContextCreate(kCFAllocatorDefault, (CFDictionaryRef)visualContextOptions, visualContext);
 			if (err != noErr) {
 				NSLog(@"HAP ERROR :: %ld, couldnt create visual context at %s", err, __func__);
 				return;
 			}
-			// Set the new-frame callback. You could use another mechanism, such as a CVDisplayLink, instead
-			//QTVisualContextSetImageAvailableCallback( *visualContext, VisualContextFrameCallback, (void*)this );
 			// Set the movie's visual context
 			err = SetMovieVisualContext( getObj()->mMovie, *visualContext );
 			if (err != noErr) {
 				NSLog(@"HAP ERROR :: %ld SetMovieVisualContext %s", err, __func__);
 				return;
 			}
-			// The movie was attached to the context, we can start it now
-			//this->play();
 		}
 		
 		// Get codec name
@@ -162,14 +157,13 @@ namespace cinder { namespace qtime {
 		this->setNewFrameCallback( updateMovieFPS, (void*)this );
 	}
 	
-	
-#if defined( CINDER_MAC )
-	static void CVOpenGLTextureDealloc( gl::Texture *texture, void *refcon )
-	{
-		CVOpenGLTextureRelease( (CVImageBufferRef)(refcon) );
-		delete texture;
-	}
-#endif // defined( CINDER_MAC )
+//#if defined( CINDER_MAC )
+//	static void CVOpenGLTextureDealloc( gl::Texture *texture, void *refcon )
+//	{
+//		CVOpenGLTextureRelease( (CVImageBufferRef)(refcon) );
+//		delete texture;
+//	}
+//#endif // defined( CINDER_MAC )
 	
 	void MovieGlHap::Obj::releaseFrame()
 	{
@@ -177,9 +171,9 @@ namespace cinder { namespace qtime {
 	
 	void MovieGlHap::Obj::newFrame( CVImageBufferRef cvImage )
 	{
-		CVPixelBufferLockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
+		::CVPixelBufferLockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
 		// Load HAP frame
-		if( CFGetTypeID( cvImage ) == ::CVPixelBufferGetTypeID() ) {
+		if( ::CFGetTypeID( cvImage ) == ::CVPixelBufferGetTypeID() ) {
 			GLuint width = ::CVPixelBufferGetWidth( cvImage );
 			GLuint height = ::CVPixelBufferGetHeight( cvImage );
 			
@@ -193,7 +187,7 @@ namespace cinder { namespace qtime {
 			
 			// Valid DXT will be a multiple of 4 wide and high
 			CI_ASSERT( !(roundedWidth % 4 != 0 || roundedHeight % 4 != 0) );
-			OSType newPixelFormat = CVPixelBufferGetPixelFormatType( cvImage );
+			OSType newPixelFormat = ::CVPixelBufferGetPixelFormatType( cvImage );
 			GLenum internalFormat;
 			unsigned int bitsPerPixel;
 			switch (newPixelFormat) {
@@ -213,13 +207,13 @@ namespace cinder { namespace qtime {
 			}
 			
 			// Ignore the value for CVPixelBufferGetBytesPerRow()
-			size_t bytesPerRow = (roundedWidth * bitsPerPixel) / 8;
-			GLsizei newDataLength = bytesPerRow * roundedHeight; // usually not the full length of the buffer
-			size_t actualBufferSize = ::CVPixelBufferGetDataSize( cvImage );
+			size_t	bytesPerRow = (roundedWidth * bitsPerPixel) / 8;
+			GLsizei	dataLength = bytesPerRow * roundedHeight; // usually not the full length of the buffer
+			size_t	actualBufferSize = ::CVPixelBufferGetDataSize( cvImage );
 			
 			// Check the buffer is as large as we expect it to be
-			CI_ASSERT( newDataLength < actualBufferSize );
-            
+			CI_ASSERT( dataLength < actualBufferSize );
+			
 			GLvoid *baseAddress = ::CVPixelBufferGetBaseAddress( cvImage );
 						
 			if ( !mTexture ) {
@@ -232,24 +226,22 @@ namespace cinder { namespace qtime {
 				
 				// We allocate the texture with no pixel data, then use CompressedTexSubImage to update the content region
 				gl::Texture::Format format;
-				format.wrap(GL_CLAMP_TO_EDGE).magFilter(GL_LINEAR).minFilter(GL_LINEAR).internalFormat(internalFormat).pixelDataType(GL_UNSIGNED_INT_8_8_8_8_REV).pixelDataFormat(GL_BGRA);
-				mTexture = gl::Texture::create(backingWidth, backingHeight, format );
+				format.wrap( GL_CLAMP_TO_EDGE ).magFilter( GL_LINEAR ).minFilter( GL_LINEAR ).internalFormat( internalFormat ).pixelDataType( GL_UNSIGNED_INT_8_8_8_8_REV ).pixelDataFormat( GL_BGRA );
+				mTexture = gl::Texture::create( backingWidth, backingHeight, format );
+//				mTexture = gl::TextureRef( new gl::Texture( backingWidth, backingHeight, format ), std::bind( CVOpenGLTextureDealloc, std::placeholders::_1, cvImage ) );
 				mTexture->setCleanTexCoords( width/(float)backingWidth, height/(float)backingHeight );
 				mTexture->setFlipped( false );
 				
 				app::console() << "created texture." << std::endl;
 				
-				{
-					gl::ScopedTextureBind bind( mTexture->getTarget(), mTexture->getId() );
-					glTexParameteri( mTexture->getTarget(), GL_TEXTURE_STORAGE_HINT_APPLE , GL_STORAGE_SHARED_APPLE );
-				}
+				/// There is no default format GL_TEXTURE_STORAGE_HINT_APPLE param so we fill it manually
+				gl::ScopedTextureBind bind( mTexture->getTarget(), mTexture->getId() );
+				glTexParameteri( mTexture->getTarget(), GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_SHARED_APPLE );
 			}
 			
-			
 			gl::ScopedTextureBind bind( mTexture );
-			glTextureRangeAPPLE( mTexture->getTarget(), newDataLength, baseAddress );
-			glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
-			
+			glTextureRangeAPPLE( mTexture->getTarget(), dataLength, baseAddress );
+			glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, 1 );
 			glCompressedTexSubImage2D(mTexture->getTarget(),
 									  0,
 									  0,
@@ -257,12 +249,14 @@ namespace cinder { namespace qtime {
 									  roundedWidth,
 									  roundedHeight,
 									  mTexture->getInternalFormat(),
-									  newDataLength,
+									  dataLength,
 									  baseAddress);
+			
+//			glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		}
 		
-		CVPixelBufferUnlockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
-		CVPixelBufferRelease(cvImage);
+		::CVPixelBufferUnlockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
+		::CVPixelBufferRelease(cvImage);
 	}
 	
 	void MovieGlHap::draw( const gl::GlslProgRef& hapQGlsl )

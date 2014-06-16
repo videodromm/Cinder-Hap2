@@ -9,34 +9,33 @@
 //#include "cinder/gl/Query.h"
 
 #include "Resources.h"
-
 #include "MovieHap.h"
 
-#include "RectRenderer.h"
+//#include "RectRenderer.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
 
+
 template <typename T> string tostr(const T& t, int p) { ostringstream os; os<<std::setprecision(p)<<std::fixed<<t; return os.str(); }
+
 
 class QuickTimeSampleApp : public AppNative {
  public:
-	void prepareSettings( Settings* settings );
-	void setup();
-
-	void keyDown( KeyEvent event );
-	void fileDrop( FileDropEvent event );
-
-	void update();
-	void draw();
+	void prepareSettings( Settings* settings ) override;
+	void setup() override;
+	void keyDown( KeyEvent event ) override;
+	void fileDrop( FileDropEvent event ) override;
+	void update() override;
+	void draw() override;
 
 	void loadMovieFile( const fs::path &path );
 
 	gl::TextureRef			mInfoTexture;
 	gl::GlslProgRef			mHapQShader;
 	qtime::MovieGlHapRef	mMovie;
-	
+	bool					mDraw;
 //	gl::QueryTimeElapsedRef mQuery;
 };
 
@@ -47,12 +46,13 @@ void QuickTimeSampleApp::prepareSettings( Settings* settings )
 
 void QuickTimeSampleApp::setup()
 {
+	mDraw = false;
 	mHapQShader = gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) );
 	
 //	mQuery = gl::QueryTimeElapsed::create();
 	
-	this->setFrameRate(60);
-	this->setFpsSampleInterval(0.25);
+	setFrameRate(60);
+	setFpsSampleInterval(0.25);
 //	fs::path moviePath = getOpenFilePath();
 //	if( ! moviePath.empty() )
 //		loadMovieFile( moviePath );
@@ -71,11 +71,15 @@ void QuickTimeSampleApp::keyDown( KeyEvent event )
 	else if( event.getChar() == 'r' ) {
 		mMovie.reset();
 	}
+	else if( event.getChar() == 'd' ) {
+		mDraw = !mDraw;
+	}
 }
 
 void QuickTimeSampleApp::loadMovieFile( const fs::path &moviePath )
 {
 //	try {
+		mMovie.reset();
 		// load up the movie, set it to loop, and begin playing
 		mMovie = qtime::MovieGlHap::create( moviePath );
 		//mMovie.setAsRect();
@@ -136,7 +140,7 @@ void QuickTimeSampleApp::draw()
 ////		qtime::drawFrame( mFrameTexture, centeredRect );
 //	}
 	
-	if (mMovie) {
+	if ( mMovie && mDraw ) {
 //		mQuery->begin();
 		mMovie->draw( mHapQShader );
 //		mQuery->end();
@@ -149,14 +153,14 @@ void QuickTimeSampleApp::draw()
 		gl::draw( mInfoTexture, toPixels( Vec2f( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) ) );
 	}
 	
-	// draw fps
-	TextLayout infoFps;
-	infoFps.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
-	infoFps.setColor( Color::white() );
-	infoFps.addLine( "Movie Framerate: " + tostr( mMovie->getPlaybackFramerate(), 1 ) );
-	infoFps.addLine( "App Framerate: " + tostr( this->getAverageFps(), 1 ) );
-	infoFps.setBorder( 4, 2 );
-	gl::draw( gl::Texture::create( infoFps.render( true ) ), Vec2f( 20, 20 ) );
+//	// draw fps
+//	TextLayout infoFps;
+//	infoFps.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
+//	infoFps.setColor( Color::white() );
+//	infoFps.addLine( "Movie Framerate: " + tostr( mMovie->getPlaybackFramerate(), 1 ) );
+//	infoFps.addLine( "App Framerate: " + tostr( this->getAverageFps(), 1 ) );
+//	infoFps.setBorder( 4, 2 );
+//	gl::draw( gl::Texture::create( infoFps.render( true ) ), Vec2f( 20, 20 ) );
 }
 
 CINDER_APP_NATIVE( QuickTimeSampleApp, RendererGl() );

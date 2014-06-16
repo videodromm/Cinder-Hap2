@@ -55,9 +55,12 @@ static Boolean HapQTCodecIsAvailable(OSType codecType)
     
     for (i = 0; i < list->count; i++ )
     {
-        if (list->list[i].cType == codecType) return true;
+        if (list->list[i].cType == codecType) {
+			DisposeCodecNameList( list );
+			return true;
+		}
     }
-    
+    DisposeCodecNameList( list );
     return false;
 }
 
