@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include <stdint.h>
+
 #include "cinder/Cinder.h"
 #include "cinder/gl/gl.h"
 #include "cinder/qtime/Quicktime.h"

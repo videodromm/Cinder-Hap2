@@ -1,8 +1,9 @@
+#include <stdint.h>
+
 #include "cinder/app/AppNative.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/Surface.h"
 #include "cinder/gl/Texture.h"
-#include "cinder/qtime/QuickTime.h"
 #include "cinder/Text.h"
 #include "cinder/Utilities.h"
 #include "cinder/ImageIo.h"

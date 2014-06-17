@@ -19,6 +19,33 @@ extern "C" {
 #include "cinder/Color.h"
 #include "cinder/gl/Context.h"
 
+
+#if defined( CINDER_MAC )
+	#include <QTKit/QTKit.h>
+	#include <QTKit/QTMovie.h>
+	#include <CoreVideo/CoreVideo.h>
+	#include <CoreVideo/CVBase.h>
+#else
+	#pragma push_macro( "__STDC_CONSTANT_MACROS" )
+	#pragma push_macro( "_STDINT_H" )
+	#undef __STDC_CONSTANT_MACROS
+	#if _MSC_VER >= 1600 // VC10 or greater
+	#define _STDINT_H
+	#define __FP__
+	#endif
+	#include <QTML.h>
+	#include <CVPixelBuffer.h>
+	#include <ImageCompression.h>
+	#include <Movies.h>
+	#include <GXMath.h>
+	#pragma pop_macro( "_STDINT_H" )
+	#pragma pop_macro( "__STDC_CONSTANT_MACROS" )
+	// this call is improperly defined as Mac-only in the headers
+	extern "C" {
+		EXTERN_API_C( OSStatus ) QTPixelBufferContextCreate( CFAllocatorRef, CFDictionaryRef, QTVisualContextRef* );
+	}
+#endif
+
 namespace cinder { namespace qtime {
 
 	// Playback Framerate
@@ -99,18 +126,25 @@ namespace cinder { namespace qtime {
 			OSStatus err = noErr;
 			QTVisualContextRef * visualContext = (QTVisualContextRef*)&getObj()->mVisualContext;
 			CFDictionaryRef pixelBufferOptions = HapQTCreateCVPixelBufferOptionsDictionary();
+
+#if defined( CINDER_MAC )
 			NSDictionary *visualContextOptions = [NSDictionary dictionaryWithObject:(NSDictionary *)pixelBufferOptions
 																			 forKey:(NSString *)kQTVisualContextPixelBufferAttributesKey];
 			::CFRelease( pixelBufferOptions );
 			err = ::QTPixelBufferContextCreate(kCFAllocatorDefault, (CFDictionaryRef)visualContextOptions, visualContext);
-			if (err != noErr) {
-				NSLog(@"HAP ERROR :: %ld, couldnt create visual context at %s", err, __func__);
+
+#else
+			err = QTPixelBufferContextCreate( kCFAllocatorDefault, pixelBufferOptions, visualContext );
+			::CFRelease( pixelBufferOptions );
+#endif
+			if( err != noErr ) {
+				app::console() << "HAP ERROR :: " << err << " couldnt create visual context " << std::endl;
 				return;
 			}
 			// Set the movie's visual context
 			err = SetMovieVisualContext( getObj()->mMovie, *visualContext );
-			if (err != noErr) {
-				NSLog(@"HAP ERROR :: %ld SetMovieVisualContext %s", err, __func__);
+			if( err != noErr ) {
+				app::console() << "HAP ERROR :: " << err << " SetMovieVisualContext" << std::endl;
 				return;
 			}
 		}
@@ -171,7 +205,7 @@ namespace cinder { namespace qtime {
 	
 	void MovieGlHap::Obj::newFrame( CVImageBufferRef cvImage )
 	{
-		::CVPixelBufferLockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
+		::CVPixelBufferLockBaseAddress( cvImage, 1 );
 		// Load HAP frame
 		if( ::CFGetTypeID( cvImage ) == ::CVPixelBufferGetTypeID() ) {
 			GLuint width = ::CVPixelBufferGetWidth( cvImage );
@@ -258,7 +292,7 @@ namespace cinder { namespace qtime {
 									  baseAddress);
 		}
 		
-		::CVPixelBufferUnlockBaseAddress(cvImage, kCVPixelBufferLock_ReadOnly);
+		::CVPixelBufferUnlockBaseAddress(cvImage, 1 );
 		::CVPixelBufferRelease(cvImage);
 	}
 	
