@@ -11,14 +11,11 @@
 #include "Resources.h"
 #include "MovieHap.h"
 
-
 using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-
 template <typename T> string tostr(const T& t, int p) { ostringstream os; os<<std::setprecision(p)<<std::fixed<<t; return os.str(); }
-
 
 class HapLoaderApp : public AppNative {
 public:
@@ -66,30 +63,29 @@ void HapLoaderApp::keyDown( KeyEvent event )
 
 void HapLoaderApp::loadMovieFile( const fs::path &moviePath )
 {
-	//	try {
-	mMovie.reset();
-	// load up the movie, set it to loop, and begin playing
-	mMovie = qtime::MovieGlHap::create( moviePath );
-	//mMovie.setAsRect();
-	mMovie->setLoop();
-	mMovie->play();
-	
-	// create a texture for showing some info about the movie
-	TextLayout infoText;
-	infoText.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
-	infoText.setColor( Color::white() );
-	infoText.addCenteredLine( moviePath.filename().string() );
-	infoText.addLine( toString( mMovie->getWidth() ) + " x " + toString( mMovie->getHeight() ) + " pixels" );
-	infoText.addLine( toString( mMovie->getDuration() ) + " seconds" );
-	infoText.addLine( toString( mMovie->getNumFrames() ) + " frames" );
-	infoText.addLine( toString( mMovie->getFramerate() ) + " fps" );
-	infoText.setBorder( 4, 2 );
-	mInfoTexture = gl::Texture::create( infoText.render( true ) );
-	//	}
-	//	catch( ... ) {
-	//		console() << "Unable to load the movie." << std::endl;
-	//		mInfoTexture.reset();
-	//	}
+	try {
+		mMovie.reset();
+		// load up the movie, set it to loop, and begin playing
+		mMovie = qtime::MovieGlHap::create( moviePath );
+		mMovie->setLoop();
+		mMovie->play();
+		
+		// create a texture for showing some info about the movie
+		TextLayout infoText;
+		infoText.clear( ColorA( 0.2f, 0.2f, 0.2f, 0.5f ) );
+		infoText.setColor( Color::white() );
+		infoText.addCenteredLine( moviePath.filename().string() );
+		infoText.addLine( toString( mMovie->getWidth() ) + " x " + toString( mMovie->getHeight() ) + " pixels" );
+		infoText.addLine( toString( mMovie->getDuration() ) + " seconds" );
+		infoText.addLine( toString( mMovie->getNumFrames() ) + " frames" );
+		infoText.addLine( toString( mMovie->getFramerate() ) + " fps" );
+		infoText.setBorder( 4, 2 );
+		mInfoTexture = gl::Texture::create( infoText.render( true ) );
+	}
+		catch( ... ) {
+			console() << "Unable to load the movie." << std::endl;
+			mInfoTexture.reset();
+	}
 	
 }
 
