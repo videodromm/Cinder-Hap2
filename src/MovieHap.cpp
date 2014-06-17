@@ -59,6 +59,7 @@ namespace cinder { namespace qtime {
 	uint32_t _FpsLastSampleFrame = 0;
 	double _FpsLastSampleTime = 0;
 	float _AverageFps = 0;
+	
 	void updateMovieFPS( long time, void *ptr )
 	{
 		double now = app::getElapsedSeconds();
@@ -71,7 +72,8 @@ namespace cinder { namespace qtime {
 		}
 		_FrameCount++;
 	}
-	float MovieGlHap::getPlaybackFramerate()
+	
+	float MovieGlHap::getPlaybackFramerate() const
 	{
 		return _AverageFps;
 	}
@@ -167,26 +169,11 @@ namespace cinder { namespace qtime {
                 DisposeHandle((Handle)imageDescription);
                 
                 switch (codecType) {
-                    case 'Hap1':
-						mCodecName = "Hap";
-                        break;
-                    case 'Hap5':
-						mCodecName = "HapA";
-                        break;
-                    case 'HapY':
-						mCodecName = "HapQ";
-                        break;
-                    default:
-						char name[5] = {
-							static_cast<char>((codecType>>24)&0xFF),
-							static_cast<char>((codecType>>16)&0xFF),
-							static_cast<char>((codecType>>8)&0xFF),
-							static_cast<char>((codecType>>0)&0xFF),
-							'\0' };
-						mCodecName = std::string(name);
-						//NSLog(@"codec [%s]",mCodecName.c_str());
-                        break;
-                }
+                    case 'Hap1': mCodec = Codec::HAP; break;
+                    case 'Hap5': mCodec = Codec::HAP_A; break;
+                    case 'HapY': mCodec = Codec::HAP_Q; break;
+                    default: mCodec = Codec::UNSUPPORTED; break;
+				}
             }
         }
 
@@ -302,6 +289,17 @@ namespace cinder { namespace qtime {
 		::CVPixelBufferRelease(cvImage);
 	}
 	
+	gl::TextureRef MovieGlHap::getTexture()
+	{
+		updateFrame();
+		
+		mObj->lock();
+		auto texture = mObj->mTexture;
+		mObj->unlock();
+		
+		return texture;
+	}
+	
 	void MovieGlHap::draw( const gl::GlslProgRef& hapQGlsl )
 	{
 		updateFrame();
@@ -309,8 +307,8 @@ namespace cinder { namespace qtime {
 		mObj->lock();
 		if( mObj->mTexture ) {
 			Rectf centeredRect = Rectf( app::toPixels( mObj->mTexture->getCleanBounds() ) ).getCenteredFit( app::toPixels( app::getWindowBounds() ), true );
-			gl::color( Color::gray(0.2) );
-			gl::drawStrokedRect( centeredRect );
+//			gl::color( Color::gray(0.2) );
+//			gl::drawStrokedRect( centeredRect );
 			gl::color( Color::white() );
 			
 			auto drawRect = [&]() {
@@ -322,7 +320,7 @@ namespace cinder { namespace qtime {
 				gl::drawSolidRect( centeredRect, Rectf(0, 0, cw/w, ch/h) );
 			};
 			
-			if( hapQGlsl && mCodecName == "HapQ" ) {
+			if( hapQGlsl && isHapQ() ) {
 				gl::ScopedGlslProg bind( hapQGlsl );
 				drawRect();
 			} else {
@@ -331,7 +329,5 @@ namespace cinder { namespace qtime {
 			}
 		}
 		mObj->unlock();
-		
-		gl::context()->sanityCheck();
 	}
 } } //namespace cinder::qtime
