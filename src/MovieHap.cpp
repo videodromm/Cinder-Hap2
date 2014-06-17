@@ -126,17 +126,14 @@ namespace cinder { namespace qtime {
 			OSStatus err = noErr;
 			QTVisualContextRef * visualContext = (QTVisualContextRef*)&getObj()->mVisualContext;
 			CFDictionaryRef pixelBufferOptions = HapQTCreateCVPixelBufferOptionsDictionary();
-
-#if defined( CINDER_MAC )
-			NSDictionary *visualContextOptions = [NSDictionary dictionaryWithObject:(NSDictionary *)pixelBufferOptions
-																			 forKey:(NSString *)kQTVisualContextPixelBufferAttributesKey];
+			
+			const CFStringRef keys[] = { kQTVisualContextPixelBufferAttributesKey };
+			CFDictionaryRef visualContextOptions = ::CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys, (const void**)&pixelBufferOptions, sizeof(keys)/sizeof(keys[0]), &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+			err = QTPixelBufferContextCreate( kCFAllocatorDefault, visualContextOptions, visualContext );
+			
 			::CFRelease( pixelBufferOptions );
-			err = ::QTPixelBufferContextCreate(kCFAllocatorDefault, (CFDictionaryRef)visualContextOptions, visualContext);
-
-#else
-			err = QTPixelBufferContextCreate( kCFAllocatorDefault, pixelBufferOptions, visualContext );
-			::CFRelease( pixelBufferOptions );
-#endif
+			::CFRelease( visualContextOptions );
+			
 			if( err != noErr ) {
 				app::console() << "HAP ERROR :: " << err << " couldnt create visual context " << std::endl;
 				return;
