@@ -44,6 +44,12 @@ extern "C" {
 	extern "C" {
 		EXTERN_API_C( OSStatus ) QTPixelBufferContextCreate( CFAllocatorRef, CFDictionaryRef, QTVisualContextRef* );
 	}
+
+
+	enum CVPixelBufferLockFlags {
+		kCVPixelBufferLock_ReadOnly = 0x00000001,
+	};
+
 #endif
 
 namespace cinder { namespace qtime {
@@ -202,7 +208,7 @@ namespace cinder { namespace qtime {
 	
 	void MovieGlHap::Obj::newFrame( CVImageBufferRef cvImage )
 	{
-		::CVPixelBufferLockBaseAddress( cvImage, 1 );
+		::CVPixelBufferLockBaseAddress( cvImage, kCVPixelBufferLock_ReadOnly );
 		// Load HAP frame
 		if( ::CFGetTypeID( cvImage ) == ::CVPixelBufferGetTypeID() ) {
 			GLuint width = ::CVPixelBufferGetWidth( cvImage );
@@ -265,12 +271,14 @@ namespace cinder { namespace qtime {
 				
 				app::console() << "created texture." << std::endl;
 				
+#if defined( CINDER_MAC )
 				/// There is no default format GL_TEXTURE_STORAGE_HINT_APPLE param so we fill it manually
 				gl::ScopedTextureBind bind( mTexture->getTarget(), mTexture->getId() );
 				glTexParameteri( mTexture->getTarget(), GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_SHARED_APPLE );
+#endif
 			}
-			
 			gl::ScopedTextureBind bind( mTexture );
+#if defined( CINDER_MAC )
 			glTextureRangeAPPLE( mTexture->getTarget(), dataLength, baseAddress );
 			/* WARNING: Even though it is present here:
 			 * https://github.com/Vidvox/hap-quicktime-playback-demo/blob/master/HapQuickTimePlayback/HapPixelBufferTexture.m#L186
@@ -278,6 +286,7 @@ namespace cinder { namespace qtime {
 			 * when movies are loaded more than once
 			 */
 //			glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, 1 );
+#endif
 			glCompressedTexSubImage2D(mTexture->getTarget(),
 									  0,
 									  0,
@@ -289,7 +298,7 @@ namespace cinder { namespace qtime {
 									  baseAddress);
 		}
 		
-		::CVPixelBufferUnlockBaseAddress(cvImage, 1 );
+		::CVPixelBufferUnlockBaseAddress( cvImage, kCVPixelBufferLock_ReadOnly );
 		::CVPixelBufferRelease(cvImage);
 	}
 	
