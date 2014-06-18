@@ -21,6 +21,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		9ED3C098B1DA43D5BC928F7C /* HapSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = 6684ADB19CA34ABDB4D00A72 /* HapSupport.c */; };
 		B0E64ECC194FAAFB008ECF56 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0E64ECB194FAAFB008ECF56 /* QuickTime.framework */; };
+		B0F5B2511951E3ED0030AD62 /* PerfTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B0F5B24F1951E3ED0030AD62 /* PerfTracker.cpp */; };
 		FC27E3CABD7A4B2BB4DEFFE0 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = B395F615766749498AC59A7D /* CinderApp.icns */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +47,8 @@
 		A70F5B54C70440AF81D01FA0 /* HapLoaderApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.cpp; name = HapLoaderApp.cpp; path = ../src/HapLoaderApp.cpp; sourceTree = "<group>"; };
 		ABA62DBAA6D44373B77A5A77 /* HapLoader_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; path = HapLoader_Prefix.pch; sourceTree = "<group>"; };
 		B0E64ECB194FAAFB008ECF56 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
+		B0F5B24F1951E3ED0030AD62 /* PerfTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PerfTracker.cpp; path = ../src/PerfTracker.cpp; sourceTree = "<group>"; };
+		B0F5B2501951E3ED0030AD62 /* PerfTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PerfTracker.h; path = ../src/PerfTracker.h; sourceTree = "<group>"; };
 		B395F615766749498AC59A7D /* CinderApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CinderApp.icns; path = ../resources/CinderApp.icns; sourceTree = "<group>"; };
 		C91041FA097C45A3B80AA36A /* MovieHap.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = MovieHap.cpp; path = ../../../src/MovieHap.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -82,6 +85,8 @@
 			isa = PBXGroup;
 			children = (
 				A70F5B54C70440AF81D01FA0 /* HapLoaderApp.cpp */,
+				B0F5B24F1951E3ED0030AD62 /* PerfTracker.cpp */,
+				B0F5B2501951E3ED0030AD62 /* PerfTracker.h */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -254,6 +259,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14265A699EF0476BB3F0370A /* HapLoaderApp.cpp in Sources */,
+				B0F5B2511951E3ED0030AD62 /* PerfTracker.cpp in Sources */,
 				19F06D448FF04150B4E524B5 /* MovieHap.cpp in Sources */,
 				9ED3C098B1DA43D5BC928F7C /* HapSupport.c in Sources */,
 			);

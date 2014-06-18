@@ -7,9 +7,12 @@
 #include "cinder/Text.h"
 #include "cinder/Utilities.h"
 #include "cinder/ImageIo.h"
+#include "cinder/Timer.h"
 
 #include "Resources.h"
 #include "MovieHap.h"
+
+#include "PerfTracker.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -31,6 +34,8 @@ public:
 	gl::TextureRef			mInfoTexture;
 	gl::GlslProgRef			mHapQShader;
 	qtime::MovieGlHapRef	mMovie;
+	
+	PerfTrackerRef			mPerfTracker;
 };
 
 void HapLoaderApp::prepareSettings( Settings* settings )
@@ -40,10 +45,13 @@ void HapLoaderApp::prepareSettings( Settings* settings )
 
 void HapLoaderApp::setup()
 {
+	mPerfTracker = PerfTracker::create( toPixels( Area( 0.15f * getWindowWidth(), 10,
+													    0.85f * getWindowWidth(), 200 ) ) );
 	mHapQShader = gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) );
 	
 	setFrameRate(60);
 	setFpsSampleInterval(0.25);
+	
 }
 
 void HapLoaderApp::keyDown( KeyEvent event )
@@ -59,6 +67,11 @@ void HapLoaderApp::keyDown( KeyEvent event )
 	else if( event.getChar() == 'r' ) {
 		mMovie.reset();
 	}
+//	else if( event.getCode() == KeyEvent::KEY_p ) {
+//		if( mMovie && mMovie->checkPlayable() ) {
+//			
+//		}
+//	}
 }
 
 void HapLoaderApp::loadMovieFile( const fs::path &moviePath )
@@ -96,12 +109,14 @@ void HapLoaderApp::fileDrop( FileDropEvent event )
 
 void HapLoaderApp::update()
 {
-	//	if (mMovie)
-	//		mFrameTexture = mMovie->getTexture();
+//	if (mMovie)
+//		mFrameTexture = mMovie->getTexture();
 }
 
 void HapLoaderApp::draw()
 {
+	mPerfTracker->startFrame();
+	
 	gl::clear( Color::black() );
 	gl::enableAlphaBlending();
 	gl::viewport( toPixels( getWindowSize() ) );
@@ -122,6 +137,10 @@ void HapLoaderApp::draw()
 	if( mInfoTexture ) {
 		gl::draw( mInfoTexture, toPixels( Vec2f( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) ) );
 	}
+	
+	mPerfTracker->endFrame();
+	
+	mPerfTracker->draw();
 	
 	// draw fps
 	TextLayout infoFps;
