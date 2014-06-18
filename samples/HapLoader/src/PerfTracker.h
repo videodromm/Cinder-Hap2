@@ -5,6 +5,7 @@
 #include "cinder/gl/Fbo.h"
 #include "cinder/gl/Batch.h"
 #include "cinder/Area.h"
+#include "cinder/Color.h"
 
 #include <boost/noncopyable.hpp>
 
@@ -24,6 +25,7 @@ public:
 		std::string					mName;
 		std::deque<double>			mFrameTimes;
 		
+		ci::Color					mColor;
 		ci::gl::VboRef				mPositionVbo;
 		ci::gl::BatchRef			mLine;
 		std::pair<double, double>	mMinMax;

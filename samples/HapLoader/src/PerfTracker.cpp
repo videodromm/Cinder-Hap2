@@ -8,6 +8,7 @@ using namespace ci;
 #include "cinder/gl/Vbo.h"
 #include "cinder/gl/Shader.h"
 #include "cinder/Log.h"
+#include "cinder/Rand.h"
 
 #include <iostream>
 #include <limits>
@@ -18,6 +19,7 @@ const size_t PerfTracker::sMaxFrames = 200;
 PerfTracker::Signal::Signal( std::string name )
 : mMinMax( std::numeric_limits<float>::min(), std::numeric_limits<float>::max() )
 , mName( name )
+, mColor( CM_HSV, Rand::randFloat(), 0.5f, 1.0f )
 {
 	geom::BufferLayout shapeLayout;
 	shapeLayout.append( geom::Attrib::POSITION, 2, 0, 0 );
@@ -63,7 +65,10 @@ void PerfTracker::GpuSignal::startFrame()
 void PerfTracker::GpuSignal::endFrame()
 {
 	mQuery->end();
-	mFrameTimes.emplace_back( mQuery->getElapsedSeconds() );
+	mFrameTimes.emplace_front( mQuery->getElapsedSeconds() );
+	if( mFrameTimes.size() > sMaxFrames ) {
+		mFrameTimes.pop_back();
+	}
 }
 
 // PERFORMANCE TRACKER ///////////////////////////////////////
@@ -73,6 +78,8 @@ PerfTracker::PerfTracker( const ci::Area& area )
 : mArea( area )
 {
 	mSignals.emplace_back( std::unique_ptr<Signal>( new CpuSignal( "CPU time" ) ) );
+	
+//	mSignals.emplace_back( std::unique_ptr<Signal>( new GpuSignal( "GPU time" ) ) );
 }
 
 void PerfTracker::startFrame()
@@ -130,7 +137,7 @@ void PerfTracker::draw()
 		}
 		signal->mPositionVbo->unmap();
 		
-		gl::color( Color::white() );
+		gl::color( signal->mColor );
 		signal->mLine->draw();
 	}
 	
