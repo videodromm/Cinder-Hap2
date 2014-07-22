@@ -15,6 +15,7 @@ extern "C" {
 #include "Resources.h"
 
 #include "cinder/CinderAssert.h"
+#include "cinder/Log.h"
 #include "cinder/app/App.h"
 #include "cinder/Color.h"
 #include "cinder/gl/Context.h"
@@ -78,10 +79,15 @@ namespace cinder { namespace qtime {
 		return _AverageFps;
 	}
 	
+	gl::GlslProgRef MovieGlHap::Obj::sHapQShader = nullptr;
+	
 	MovieGlHap::Obj::Obj()
 	: MovieBase::Obj()
 	, mDefaultShader( gl::getStockShader( gl::ShaderDef().texture() ) )
 	{
+		std::call_once( mHapQOnceFlag, []() {
+			MovieGlHap::Obj::sHapQShader = gl::GlslProg::create( app::loadResource(RES_HAP_VERT),  app::loadResource(RES_HAP_FRAG) );
+		} );
 	}
 	
 	MovieGlHap::Obj::~Obj()
@@ -122,7 +128,7 @@ namespace cinder { namespace qtime {
 	
 	MovieGlHap::~MovieGlHap()
 	{
-		app::console() << "detroying movie hap" << std::endl;
+		CI_LOG_I( "Detroying movie hap." );
 	}
 
 	void MovieGlHap::allocateVisualContext()
@@ -143,13 +149,13 @@ namespace cinder { namespace qtime {
 			::CFRelease( visualContextOptions );
 			
 			if( err != noErr ) {
-				app::console() << "HAP ERROR :: " << err << " couldnt create visual context " << std::endl;
+				CI_LOG_E( "HAP ERROR :: " << err << " couldnt create visual context." );
 				return;
 			}
 			// Set the movie's visual context
 			err = SetMovieVisualContext( getObj()->mMovie, *visualContext );
 			if( err != noErr ) {
-				app::console() << "HAP ERROR :: " << err << " SetMovieVisualContext" << std::endl;
+				CI_LOG_E( "HAP ERROR :: " << err << " SetMovieVisualContext." );
 				return;
 			}
 		}
@@ -256,7 +262,7 @@ namespace cinder { namespace qtime {
 				mTexture->setCleanTexCoords( width/(float)backingWidth, height/(float)backingHeight );
 				mTexture->setFlipped( false );
 				
-				app::console() << "created texture." << std::endl;
+				CI_LOG_I( "Created texture." );
 				
 #if defined( CINDER_MAC )
 				/// There is no default format GL_TEXTURE_STORAGE_HINT_APPLE param so we fill it manually
@@ -300,15 +306,18 @@ namespace cinder { namespace qtime {
 		return texture;
 	}
 	
-	void MovieGlHap::draw( const gl::GlslProgRef& hapQGlsl )
+	gl::GlslProgRef MovieGlHap::getGlsl() const
+	{
+		return isHapQ() ? MovieGlHap::Obj::sHapQShader : mObj->mDefaultShader;
+	}
+	
+	void MovieGlHap::draw()
 	{
 		updateFrame();
 		
 		mObj->lock();
 		if( mObj->mTexture ) {
 			Rectf centeredRect = Rectf( app::toPixels( mObj->mTexture->getCleanBounds() ) ).getCenteredFit( app::toPixels( app::getWindowBounds() ), true );
-//			gl::color( Color::gray(0.2) );
-//			gl::drawStrokedRect( centeredRect );
 			gl::color( Color::white() );
 			
 			auto drawRect = [&]() {
@@ -320,8 +329,8 @@ namespace cinder { namespace qtime {
 				gl::drawSolidRect( centeredRect, Rectf(0, 0, cw/w, ch/h) );
 			};
 			
-			if( hapQGlsl && isHapQ() ) {
-				gl::ScopedGlslProg bind( hapQGlsl );
+			if( isHapQ() ) {
+				gl::ScopedGlslProg bind( MovieGlHap::Obj::sHapQShader );
 				drawRect();
 			} else {
 				gl::ScopedGlslProg bind( mObj->mDefaultShader );

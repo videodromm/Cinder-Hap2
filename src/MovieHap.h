@@ -29,7 +29,8 @@ namespace cinder { namespace qtime {
 		MovieGlHap( DataSourceRef dataSource, const std::string mimeTypeHint = "" );
 		
 		gl::TextureRef getTexture();
-		void draw( const gl::GlslProgRef& hapQGlsl = nullptr );
+		gl::GlslProgRef getGlsl() const;
+		void draw();
 		
 		bool			isHap() const { return mCodec == Codec::HAP; }
 		bool			isHapA() const { return mCodec == Codec::HAP_A; }
@@ -55,6 +56,8 @@ namespace cinder { namespace qtime {
 			virtual void		newFrame( CVImageBufferRef cvImage );
 			gl::TextureRef		mTexture;
 			gl::GlslProgRef		mDefaultShader;
+			static gl::GlslProgRef	sHapQShader;
+			std::once_flag			mHapQOnceFlag;
 		};
 		std::unique_ptr<Obj>		mObj;
 		virtual MovieBase::Obj*		getObj() const { return mObj.get(); }

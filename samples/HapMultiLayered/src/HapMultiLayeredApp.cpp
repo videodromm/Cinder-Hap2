@@ -16,17 +16,13 @@ class HapMultiLayeredApp : public AppNative {
 	void update();
 	void draw();
 
-	gl::GlslProgRef			mHapQShader;
 	qtime::MovieGlHapRef	mMovieBg, mMovieFront;
 };
 
 void HapMultiLayeredApp::setup()
 {
-	mHapQShader = gl::GlslProg::create( app::loadResource( RES_HAP_VERT ), app::loadResource( RES_HAP_FRAG ) );
-
 	setFrameRate( 60 );
 	setFpsSampleInterval( 0.25 );
-
 
 	mMovieBg = qtime::MovieGlHap::create( loadAsset( "SampleHapQ.mov" ) );
 	mMovieFront = qtime::MovieGlHap::create( loadAsset( "SampleHapAlpha.mov" ) );
@@ -54,11 +50,11 @@ void HapMultiLayeredApp::draw()
 	gl::viewport( toPixels( getWindowSize() ) );
 
 	if( mMovieBg ) {
-		mMovieBg->draw( mHapQShader );
+		mMovieBg->draw();
 	}
 
 	if( mMovieFront ) {
-		mMovieFront->draw( mHapQShader );
+		mMovieFront->draw();
 	}
 }
 
