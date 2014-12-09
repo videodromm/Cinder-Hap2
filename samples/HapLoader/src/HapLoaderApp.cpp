@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 #include "cinder/app/AppNative.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/Surface.h"
@@ -48,7 +46,6 @@ void HapLoaderApp::setup()
 //													    0.85f * getWindowWidth(), 200 ) ) );
 	setFrameRate(60);
 	setFpsSampleInterval(0.25);
-	
 }
 
 void HapLoaderApp::keyDown( KeyEvent event )
@@ -110,11 +107,11 @@ void HapLoaderApp::draw()
 	gl::viewport( toPixels( getWindowSize() ) );
 	
 	// draw grid
-	Vec2f sz = toPixels( getWindowSize() ) / Vec2f(8,6);
-	gl::color( Color::gray(0.2));
+	ivec2 sz = toPixels( getWindowSize() ) / ivec2( 8, 6 );
+	gl::color( Color::gray( 0.2f ) );
 	for (int x = 0 ; x < 8 ; x++ )
 		for (int y = (x%2?0:1) ; y < 6 ; y+=2 )
-			gl::drawSolidRect( Rectf(0,0,sz.x,sz.y) + sz * Vec2f(x,y) );
+			gl::drawSolidRect( Rectf( 0.0f, 0.0f, sz.x, sz.y ) + sz * ivec2( x, y ) );
 	
 	
 //	mPerfTracker->startFrame();
@@ -125,7 +122,7 @@ void HapLoaderApp::draw()
 	
 	// draw info
 	if( mInfoTexture ) {
-		gl::draw( mInfoTexture, toPixels( Vec2f( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) ) );
+		gl::draw( mInfoTexture, toPixels( ivec2( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) ) );
 	}
 	
 //	mPerfTracker->draw();
@@ -137,7 +134,7 @@ void HapLoaderApp::draw()
 	infoFps.addLine( "Movie Framerate: " + tostr( mMovie->getPlaybackFramerate(), 1 ) );
 	infoFps.addLine( "App Framerate: " + tostr( this->getAverageFps(), 1 ) );
 	infoFps.setBorder( 4, 2 );
-	gl::draw( gl::Texture::create( infoFps.render( true ) ), Vec2f( 20, 20 ) );
+	gl::draw( gl::Texture::create( infoFps.render( true ) ), ivec2( 20, 20 ) );
 }
 
 CINDER_APP_NATIVE( HapLoaderApp, RendererGl() );

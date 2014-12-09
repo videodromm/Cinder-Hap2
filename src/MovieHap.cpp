@@ -30,10 +30,7 @@ extern "C" {
 	#pragma push_macro( "__STDC_CONSTANT_MACROS" )
 	#pragma push_macro( "_STDINT_H" )
 	#undef __STDC_CONSTANT_MACROS
-	#if _MSC_VER >= 1600 // VC10 or greater
-	#define _STDINT_H
-	#define __FP__
-	#endif
+
 	#include <QTML.h>
 	#include <CVPixelBuffer.h>
 	#include <ImageCompression.h>
@@ -41,6 +38,7 @@ extern "C" {
 	#include <GXMath.h>
 	#pragma pop_macro( "_STDINT_H" )
 	#pragma pop_macro( "__STDC_CONSTANT_MACROS" )
+
 	// this call is improperly defined as Mac-only in the headers
 	extern "C" {
 		EXTERN_API_C( OSStatus ) QTPixelBufferContextCreate( CFAllocatorRef, CFDictionaryRef, QTVisualContextRef* );
@@ -255,12 +253,10 @@ namespace cinder { namespace qtime {
 				while (backingHeight < roundedHeight) backingHeight <<= 1;
 				
 				// We allocate the texture with no pixel data, then use CompressedTexSubImage to update the content region
-				gl::Texture::Format format;
-				format.wrap( GL_CLAMP_TO_EDGE ).magFilter( GL_LINEAR ).minFilter( GL_LINEAR ).internalFormat( internalFormat ).pixelDataType( GL_UNSIGNED_INT_8_8_8_8_REV ).pixelDataFormat( GL_BGRA );
-				mTexture = gl::Texture::create( backingWidth, backingHeight, format );
-//				mTexture = gl::TextureRef( new gl::Texture( backingWidth, backingHeight, format ), std::bind( CVOpenGLTextureDealloc, std::placeholders::_1, cvImage ) );
-				mTexture->setCleanTexCoords( width/(float)backingWidth, height/(float)backingHeight );
-				mTexture->setFlipped( false );
+				gl::Texture2d::Format format;
+				format.wrap( GL_CLAMP_TO_EDGE ).magFilter( GL_LINEAR ).minFilter( GL_LINEAR ).internalFormat( internalFormat ).dataType( GL_UNSIGNED_INT_8_8_8_8_REV ).immutableStorage();// .pixelDataFormat( GL_BGRA );
+				mTexture = gl::Texture2d::create( backingWidth, backingHeight, format );
+				mTexture->setCleanSize( width, height );
 				
 				CI_LOG_I( "Created texture." );
 				
@@ -326,7 +322,7 @@ namespace cinder { namespace qtime {
 				float ch = mObj->mTexture->getCleanHeight();
 				float w = mObj->mTexture->getWidth();
 				float h = mObj->mTexture->getHeight();
-				gl::drawSolidRect( centeredRect, Rectf(0, 0, cw/w, ch/h) );
+				gl::drawSolidRect( centeredRect, vec2( 0, 0 ), vec2( cw / w, ch / h ) );
 			};
 			
 			if( isHapQ() ) {

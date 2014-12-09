@@ -7,12 +7,16 @@
  */
 #pragma once
 
-#include <stdint.h>
-
 #include "cinder/Cinder.h"
 #include "cinder/gl/gl.h"
-#include "cinder/qtime/Quicktime.h"
 #include "cinder/gl/GlslProg.h"
+#include "cinder/gl/Texture.h"
+
+#if defined( CINDER_MSW )
+#define _STDINT_H
+#define __FP__
+#endif
+#include "cinder/qtime/QuicktimeGl.h"
 
 namespace cinder { namespace qtime {
 	
@@ -28,7 +32,7 @@ namespace cinder { namespace qtime {
 		MovieGlHap( const void *data, size_t dataSize, const std::string &fileNameHint, const std::string &mimeTypeHint = "" );
 		MovieGlHap( DataSourceRef dataSource, const std::string mimeTypeHint = "" );
 		
-		gl::TextureRef getTexture();
+		gl::Texture2dRef getTexture();
 		gl::GlslProgRef getGlsl() const;
 		void draw();
 		
@@ -54,7 +58,7 @@ namespace cinder { namespace qtime {
 			~Obj();
 			virtual void		releaseFrame();
 			virtual void		newFrame( CVImageBufferRef cvImage );
-			gl::TextureRef		mTexture;
+			gl::Texture2dRef	mTexture;
 			gl::GlslProgRef		mDefaultShader;
 			static gl::GlslProgRef	sHapQShader;
 			std::once_flag			mHapQOnceFlag;
