@@ -10,7 +10,7 @@
 #include "Resources.h"
 #include "MovieHap.h"
 
-//#include "PerfTracker.h"
+#include "PerfTracker.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -32,7 +32,7 @@ public:
 	gl::TextureRef			mInfoTexture;
 	qtime::MovieGlHapRef	mMovie;
 	
-//	PerfTrackerRef			mPerfTracker;
+	PerfTrackerRef			mPerfTracker;
 };
 
 void HapLoaderApp::prepareSettings( Settings* settings )
@@ -42,8 +42,8 @@ void HapLoaderApp::prepareSettings( Settings* settings )
 
 void HapLoaderApp::setup()
 {
-//	mPerfTracker = PerfTracker::create( toPixels( Area( 0.15f * getWindowWidth(), 10,
-//													    0.85f * getWindowWidth(), 200 ) ) );
+	mPerfTracker = PerfTracker::create( Area(	0.15f * getWindowWidth(), 10,
+												0.85f * getWindowWidth(), 200 ) );
 	setFrameRate(60);
 	setFpsSampleInterval(0.25);
 }
@@ -114,18 +114,18 @@ void HapLoaderApp::draw()
 			gl::drawSolidRect( Rectf( 0.0f, 0.0f, sz.x, sz.y ) + sz * ivec2( x, y ) );
 	
 	
-//	mPerfTracker->startFrame();
+	mPerfTracker->startFrame();
 	if ( mMovie ) {
 		mMovie->draw();
 	}
-//	mPerfTracker->endFrame();
+	mPerfTracker->endFrame();
+	
+	mPerfTracker->draw();
 	
 	// draw info
 	if( mInfoTexture ) {
 		gl::draw( mInfoTexture, ivec2( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) );
 	}
-	
-//	mPerfTracker->draw();
 	
 	// draw fps
 	TextLayout infoFps;
