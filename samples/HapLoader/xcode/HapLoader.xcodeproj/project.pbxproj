@@ -20,6 +20,8 @@
 		822789673255430888AE9BD8 /* ScaledCoCgYToRGBA.vert in Resources */ = {isa = PBXBuildFile; fileRef = 726D6EF9B0D64EAE84844ACD /* ScaledCoCgYToRGBA.vert */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		9ED3C098B1DA43D5BC928F7C /* HapSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = 6684ADB19CA34ABDB4D00A72 /* HapSupport.c */; };
+		B05564751A3751100093A13D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B05564741A3751100093A13D /* AVFoundation.framework */; };
+		B05564771A3751170093A13D /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B05564761A3751170093A13D /* CoreMedia.framework */; };
 		B0E64ECC194FAAFB008ECF56 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0E64ECB194FAAFB008ECF56 /* QuickTime.framework */; };
 		B0F5B2511951E3ED0030AD62 /* PerfTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B0F5B24F1951E3ED0030AD62 /* PerfTracker.cpp */; };
 		FC27E3CABD7A4B2BB4DEFFE0 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = B395F615766749498AC59A7D /* CinderApp.icns */; };
@@ -46,6 +48,8 @@
 		8D1107320486CEB800E47090 /* HapLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HapLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A70F5B54C70440AF81D01FA0 /* HapLoaderApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.cpp; name = HapLoaderApp.cpp; path = ../src/HapLoaderApp.cpp; sourceTree = "<group>"; };
 		ABA62DBAA6D44373B77A5A77 /* HapLoader_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = "\"\""; path = HapLoader_Prefix.pch; sourceTree = "<group>"; };
+		B05564741A3751100093A13D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		B05564761A3751170093A13D /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		B0E64ECB194FAAFB008ECF56 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
 		B0F5B24F1951E3ED0030AD62 /* PerfTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PerfTracker.cpp; path = ../src/PerfTracker.cpp; sourceTree = "<group>"; };
 		B0F5B2501951E3ED0030AD62 /* PerfTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PerfTracker.h; path = ../src/PerfTracker.h; sourceTree = "<group>"; };
@@ -58,6 +62,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B05564771A3751170093A13D /* CoreMedia.framework in Frameworks */,
+				B05564751A3751100093A13D /* AVFoundation.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				0091D8F90E81B9330029341E /* OpenGL.framework in Frameworks */,
 				5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */,
@@ -158,6 +164,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B05564761A3751170093A13D /* CoreMedia.framework */,
+				B05564741A3751100093A13D /* AVFoundation.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);

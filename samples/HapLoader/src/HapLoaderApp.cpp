@@ -107,7 +107,7 @@ void HapLoaderApp::draw()
 	gl::viewport( toPixels( getWindowSize() ) );
 	
 	// draw grid
-	ivec2 sz = toPixels( getWindowSize() ) / ivec2( 8, 6 );
+	ivec2 sz = getWindowSize() / ivec2( 8, 6 );
 	gl::color( Color::gray( 0.2f ) );
 	for (int x = 0 ; x < 8 ; x++ )
 		for (int y = (x%2?0:1) ; y < 6 ; y+=2 )
@@ -122,7 +122,7 @@ void HapLoaderApp::draw()
 	
 	// draw info
 	if( mInfoTexture ) {
-		gl::draw( mInfoTexture, toPixels( ivec2( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) ) );
+		gl::draw( mInfoTexture, ivec2( 20, getWindowHeight() - 20 - mInfoTexture->getHeight() ) );
 	}
 	
 //	mPerfTracker->draw();

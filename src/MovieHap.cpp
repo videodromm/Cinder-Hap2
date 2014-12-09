@@ -313,7 +313,7 @@ namespace cinder { namespace qtime {
 		
 		mObj->lock();
 		if( mObj->mTexture ) {
-			Rectf centeredRect = Rectf( app::toPixels( mObj->mTexture->getCleanBounds() ) ).getCenteredFit( app::toPixels( app::getWindowBounds() ), true );
+			Rectf centeredRect = Rectf( mObj->mTexture->getCleanBounds() ).getCenteredFit( app::getWindowBounds(), true );
 			gl::color( Color::white() );
 			
 			auto drawRect = [&]() {
