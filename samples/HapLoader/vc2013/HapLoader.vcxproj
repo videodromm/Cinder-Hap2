@@ -199,11 +199,13 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\MovieHap.cpp" />
     <ClCompile Include="..\..\..\src\HapSupport.c" />
+    <ClCompile Include="..\src\PerfTracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h" />
     <ClInclude Include="..\..\..\src\HapSupport.h" />
     <ClInclude Include="..\..\..\src\MovieHap.h" />
+    <ClInclude Include="..\src\PerfTracker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
