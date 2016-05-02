@@ -1,4 +1,4 @@
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/Surface.h"
 #include "cinder/gl/Texture.h"
@@ -18,9 +18,8 @@ using namespace std;
 
 template <typename T> string tostr(const T& t, int p) { ostringstream os; os<<std::setprecision(p)<<std::fixed<<t; return os.str(); }
 
-class HapLoaderApp : public AppNative {
+class HapLoaderApp : public App {
 public:
-	void prepareSettings( Settings* settings ) override;
 	void setup() override;
 	void keyDown( KeyEvent event ) override;
 	void fileDrop( FileDropEvent event ) override;
@@ -35,9 +34,9 @@ public:
 	PerfTrackerRef			mPerfTracker;
 };
 
-void HapLoaderApp::prepareSettings( Settings* settings )
+static void prepareSettings(App::Settings* settings)
 {
-	settings->enableHighDensityDisplay();
+	settings->setHighDensityDisplayEnabled();
 }
 
 void HapLoaderApp::setup()
@@ -137,4 +136,4 @@ void HapLoaderApp::draw()
 	gl::draw( gl::Texture::create( infoFps.render( true ) ), ivec2( 20, 20 ) );
 }
 
-CINDER_APP_NATIVE( HapLoaderApp, RendererGl() );
+CINDER_APP( HapLoaderApp, RendererGl() );
