@@ -246,11 +246,11 @@ namespace cinder { namespace qtime {
 						
 			if ( !mTexture ) {
 				// On NVIDIA hardware there is a massive slowdown if DXT textures aren't POT-dimensioned, so we use POT-dimensioned backing
-				GLuint backingWidth = 1;
+				/*GLuint backingWidth = 1;
 				while (backingWidth < roundedWidth) backingWidth <<= 1;
 				
 				GLuint backingHeight = 1;
-				while (backingHeight < roundedHeight) backingHeight <<= 1;
+				while (backingHeight < roundedHeight) backingHeight <<= 1;*/
 				
 				// We allocate the texture with no pixel data, then use CompressedTexSubImage to update the content region
 				gl::Texture2d::Format format;
