@@ -255,7 +255,8 @@ namespace cinder { namespace qtime {
 				// We allocate the texture with no pixel data, then use CompressedTexSubImage to update the content region
 				gl::Texture2d::Format format;
 				format.wrap( GL_CLAMP_TO_EDGE ).magFilter( GL_LINEAR ).minFilter( GL_LINEAR ).internalFormat( internalFormat ).dataType( GL_UNSIGNED_INT_8_8_8_8_REV ).immutableStorage();// .pixelDataFormat( GL_BGRA );
-				mTexture = gl::Texture2d::create( backingWidth, backingHeight, format );
+				// BL mTexture = gl::Texture2d::create(backingWidth, backingHeight, format);
+				mTexture = gl::Texture2d::create(width, height, format);
 				mTexture->setCleanBounds(Area(0, 0, width, height));
 				
 				CI_LOG_I( "Created texture." );
